@@ -16,6 +16,8 @@ import {
   FileText,
   LogOut,
   UserCircle,
+  ChevronRight,
+  ChevronDown,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useLocation } from "react-router-dom";
@@ -30,10 +32,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
 import { useUser, useClerk } from "@clerk/clerk-react";
+import { ContentService } from "@/services/contentService";
 
 const sidebarVariants = {
   open: {
-    width: "15rem",
+    width: "20rem",
   },
   closed: {
     width: "3.05rem",
@@ -74,52 +77,47 @@ const staggerVariants = {
   },
 };
 
-const ataChapters = [
-  { code: "05", title: "Time Limits/Maintenance Checks" },
-  { code: "21", title: "Air Conditioning" },
-  { code: "24", title: "Electrical Power" },
-  { code: "27", title: "Flight Controls" },
-  { code: "28", title: "Fuel" },
-  { code: "29", title: "Hydraulic Power" },
-  { code: "32", title: "Landing Gear" },
-  { code: "34", title: "Navigation" },
-  { code: "36", title: "Pneumatic" },
-  { code: "49", title: "Airborne Auxiliary Power" },
-  { code: "70", title: "Standard Practices - Engines" },
-  { code: "71", title: "Power Plant" },
-  { code: "72", title: "Engine" },
-  { code: "73", title: "Engine Fuel and Control" },
-  { code: "74", title: "Ignition" },
-  { code: "75", title: "Air" },
-  { code: "76", title: "Engine Controls" },
-  { code: "77", title: "Engine Indicating" },
-  { code: "78", title: "Exhaust" },
-  { code: "79", title: "Oil" },
-  { code: "80", title: "Starting" }
-];
-
 interface AircraftSidebarProps {
-  selectedChapter: string | null;
-  onChapterSelect: (chapter: string | null) => void;
+  selectedContent: { chapter: string; section: string; file: string } | null;
+  onContentSelect: (content: { chapter: string; section: string; file: string } | null) => void;
 }
 
-export function AircraftSidebar({ selectedChapter, onChapterSelect }: AircraftSidebarProps) {
+export function AircraftSidebar({ selectedContent, onContentSelect }: AircraftSidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(true);
+  const [expandedChapters, setExpandedChapters] = useState<Set<string>>(new Set());
   const location = useLocation();
   const pathname = location.pathname;
   const { user } = useUser();
   const { signOut } = useClerk();
 
+  // Get content structure from ContentService
+  const contentStructure = ContentService.getContentStructure();
+
   const handleSignOut = () => {
     signOut();
   };
 
-  const handleChapterClick = (chapterCode: string) => {
-    // Toggle chapter selection - if already selected, deselect it
-    if (selectedChapter === chapterCode) {
-      onChapterSelect(null);
+  const toggleChapter = (chapterCode: string) => {
+    const newExpanded = new Set(expandedChapters);
+    if (newExpanded.has(chapterCode)) {
+      newExpanded.delete(chapterCode);
     } else {
-      onChapterSelect(chapterCode);
+      newExpanded.add(chapterCode);
+    }
+    setExpandedChapters(newExpanded);
+  };
+
+  const handleContentSelect = (chapter: string, section: string, file: string) => {
+    const contentKey = { chapter, section, file };
+    
+    // If already selected, deselect
+    if (selectedContent && 
+        selectedContent.chapter === chapter && 
+        selectedContent.section === section && 
+        selectedContent.file === file) {
+      onContentSelect(null);
+    } else {
+      onContentSelect(contentKey);
     }
   };
 
@@ -141,6 +139,7 @@ export function AircraftSidebar({ selectedChapter, onChapterSelect }: AircraftSi
       >
         <motion.ul variants={staggerVariants} className="flex h-full flex-col">
           <div className="flex grow flex-col items-center">
+            {/* Header */}
             <div className="flex h-[54px] w-full shrink-0 border-b p-2">
               <div className="mt-[1.5px] flex w-full">
                 <DropdownMenu modal={false}>
@@ -186,6 +185,7 @@ export function AircraftSidebar({ selectedChapter, onChapterSelect }: AircraftSi
               <div className="flex grow flex-col gap-4">
                 <ScrollArea className="h-16 grow p-2">
                   <div className={cn("flex w-full flex-col gap-1")}>
+                    {/* Navigation Items */}
                     <a
                       href="/dashboard"
                       className={cn(
@@ -234,31 +234,73 @@ export function AircraftSidebar({ selectedChapter, onChapterSelect }: AircraftSi
                       </motion.div>
                     )}
 
-                    {ataChapters.map((chapter) => (
-                      <div
-                        key={chapter.code}
-                        className={cn(
-                          "flex h-8 w-full flex-row items-center rounded-md px-2 py-1.5 transition hover:bg-muted hover:text-primary cursor-pointer",
-                          selectedChapter === chapter.code && "bg-muted text-blue-600",
-                        )}
-                        onClick={() => handleChapterClick(chapter.code)}
-                      >
-                        <span className="text-xs font-mono bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded min-w-[2rem] text-center">
-                          {chapter.code}
-                        </span>
-                        <motion.li variants={variants}>
-                          {!isCollapsed && (
-                            <p className="ml-2 text-sm font-medium truncate">
-                              {chapter.title}
-                            </p>
+                    {/* ATA Chapters with hierarchical structure */}
+                    {Object.entries(contentStructure).map(([chapterCode, chapterData]) => {
+                      const isExpanded = expandedChapters.has(chapterCode);
+                      
+                      return (
+                        <div key={chapterCode} className="w-full">
+                          {/* Chapter Header */}
+                          <div
+                            className={cn(
+                              "flex h-8 w-full flex-row items-center rounded-md px-2 py-1.5 transition hover:bg-muted hover:text-primary cursor-pointer",
+                            )}
+                            onClick={() => toggleChapter(chapterCode)}
+                          >
+                            <span className="text-xs font-mono bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded min-w-[2rem] text-center">
+                              {chapterCode}
+                            </span>
+                            <motion.li variants={variants} className="flex items-center justify-between w-full">
+                              {!isCollapsed && (
+                                <>
+                                  <p className="ml-2 text-sm font-medium truncate">
+                                    {chapterData.title}
+                                  </p>
+                                  {isExpanded ? (
+                                    <ChevronDown className="h-3 w-3 ml-1" />
+                                  ) : (
+                                    <ChevronRight className="h-3 w-3 ml-1" />
+                                  )}
+                                </>
+                              )}
+                            </motion.li>
+                          </div>
+
+                          {/* Chapter Sections */}
+                          {isExpanded && !isCollapsed && (
+                            <div className="ml-4 mt-1 space-y-1">
+                              {Object.entries(chapterData.sections).map(([sectionKey, sectionData]) => (
+                                <div key={sectionKey} className="space-y-1">
+                                  {sectionData.files.map((file) => (
+                                    <div
+                                      key={file.id}
+                                      className={cn(
+                                        "flex h-7 w-full flex-row items-center rounded-md px-2 py-1 transition hover:bg-muted hover:text-primary cursor-pointer text-sm",
+                                        selectedContent?.chapter === chapterCode && 
+                                        selectedContent?.section === sectionKey && 
+                                        selectedContent?.file === file.slug &&
+                                        "bg-muted text-blue-600",
+                                      )}
+                                      onClick={() => handleContentSelect(chapterCode, sectionKey, file.slug)}
+                                    >
+                                      <FileText className="h-3 w-3" />
+                                      <p className="ml-2 text-xs truncate">
+                                        {file.title}
+                                      </p>
+                                    </div>
+                                  ))}
+                                </div>
+                              ))}
+                            </div>
                           )}
-                        </motion.li>
-                      </div>
-                    ))}
+                        </div>
+                      );
+                    })}
                   </div>
                 </ScrollArea>
               </div>
               
+              {/* Footer */}
               <div className="flex flex-col p-2">
                 <div className="mt-auto flex h-8 w-full flex-row items-center rounded-md px-2 py-1.5 transition hover:bg-muted hover:text-primary cursor-pointer">
                   <Settings className="h-4 w-4 shrink-0" />

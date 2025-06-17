@@ -9,10 +9,10 @@ import { useState, useMemo, useEffect } from "react";
 import type { MarkdownContent } from "@/types/content";
 
 interface ContentAreaProps {
-  selectedChapter: string | null;
+  selectedContent: { chapter: string; section: string; file: string } | null;
 }
 
-export function ContentArea({ selectedChapter }: ContentAreaProps) {
+export function ContentArea({ selectedContent }: ContentAreaProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   
@@ -26,31 +26,39 @@ export function ContentArea({ selectedChapter }: ContentAreaProps) {
   }, []);
   
   const stats = ContentService.getContentStats();
-  const availableChapters = ContentService.getAvailableChapters();
   
-  const filteredContent = useMemo(() => {
-    console.log(`🔄 Filtering content with selectedChapter: ${selectedChapter}, searchQuery: "${searchQuery}"`);
+  const displayContent = useMemo(() => {
+    console.log(`🔄 ContentArea rendering with selectedContent:`, selectedContent);
     
-    let content: MarkdownContent[] = [];
-    
-    // Priority: if a chapter is selected, show ONLY that chapter's content
-    if (selectedChapter) {
-      content = ContentService.getContentByChapter(selectedChapter);
-      console.log(`📋 Showing content for chapter ${selectedChapter}: ${content.length} items`);
-    } 
-    // If searching but no chapter selected, show search results
-    else if (searchQuery.trim()) {
-      content = ContentService.searchContent(searchQuery);
-      console.log(`🔍 Search results for "${searchQuery}": ${content.length} items`);
-    } 
-    // Default: show overview of all content (limited for performance)
-    else {
-      content = ContentService.getAllContent().slice(0, 8);
-      console.log(`📚 Showing overview: ${content.length} items`);
+    // If specific content is selected, show only that content
+    if (selectedContent) {
+      const specificContent = ContentService.getSpecificContent(
+        selectedContent.chapter, 
+        selectedContent.section, 
+        selectedContent.file
+      );
+      
+      if (specificContent) {
+        console.log(`📄 Displaying specific content: ${specificContent.title}`);
+        return [specificContent];
+      } else {
+        console.log(`❌ Specific content not found`);
+        return [];
+      }
     }
     
-    return content;
-  }, [searchQuery, selectedChapter]);
+    // If searching, show search results
+    if (searchQuery.trim()) {
+      const results = ContentService.searchContent(searchQuery);
+      console.log(`🔍 Search results for "${searchQuery}": ${results.length} items`);
+      return results;
+    }
+    
+    // Default: show overview of all content (limited for performance)
+    const allContent = ContentService.getAllContent().slice(0, 8);
+    console.log(`📚 Showing overview: ${allContent.length} items`);
+    return allContent;
+  }, [selectedContent, searchQuery]);
 
   if (isLoading) {
     return (
@@ -70,43 +78,41 @@ export function ContentArea({ selectedChapter }: ContentAreaProps) {
         {/* Header */}
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-slate-900 mb-2">
-            {selectedChapter ? `ATA Chapter ${selectedChapter} Content` : 'Learning Content'}
+            {selectedContent 
+              ? `ATA Chapter ${selectedContent.chapter} - ${displayContent[0]?.title || 'Content'}` 
+              : 'Learning Content'
+            }
           </h2>
           <p className="text-slate-600">
-            {selectedChapter 
-              ? `Browse all materials for ATA Chapter ${selectedChapter}` 
+            {selectedContent 
+              ? `Viewing specific content from ATA Chapter ${selectedContent.chapter}` 
               : 'Access your comprehensive aircraft engineering materials organized by ATA chapters'
             }
           </p>
         </div>
 
-        {/* Search and Filter Bar */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
-            <Input 
-              placeholder={selectedChapter ? `Search within ATA ${selectedChapter}...` : "Search content, chapters, or topics..."} 
-              className="pl-10"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            {selectedChapter && (
-              <Badge variant="secondary" className="text-sm">
-                ATA Chapter {selectedChapter}
-              </Badge>
-            )}
+        {/* Search Bar - only show when no specific content is selected */}
+        {!selectedContent && (
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
+              <Input 
+                placeholder="Search content, chapters, or topics..."
+                className="pl-10"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
             {searchQuery && (
               <Badge variant="outline" className="text-sm">
                 Search: "{searchQuery}"
               </Badge>
             )}
           </div>
-        </div>
+        )}
 
-        {/* Show stats only when no specific chapter is selected */}
-        {!selectedChapter && (
+        {/* Show stats only when no specific content is selected */}
+        {!selectedContent && !searchQuery && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -141,73 +147,111 @@ export function ContentArea({ selectedChapter }: ContentAreaProps) {
           </div>
         )}
 
-        {/* Debug Info */}
-        <div className="mb-4 p-2 bg-blue-50 rounded text-sm">
-          <p><strong>Debug:</strong> Selected: {selectedChapter || 'None'}, Search: "{searchQuery}", Results: {filteredContent.length}</p>
-        </div>
-
-        {/* Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {filteredContent.map((content) => (
-            <Card key={content.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Badge variant="secondary" className="text-xs">
-                        ATA {content.ataChapter}
-                      </Badge>
-                      {content.subSection && (
-                        <Badge variant="outline" className="text-xs">
-                          {content.subSection}
+        {/* Content Display */}
+        {selectedContent && displayContent.length > 0 ? (
+          // Single content view
+          <div className="bg-white rounded-lg shadow-sm border p-8">
+            <div className="mb-6">
+              <div className="flex items-center gap-2 mb-4">
+                <Badge variant="secondary" className="text-sm">
+                  ATA {displayContent[0].ataChapter}
+                </Badge>
+                {displayContent[0].subSection && (
+                  <Badge variant="outline" className="text-sm">
+                    {displayContent[0].subSection}
+                  </Badge>
+                )}
+                {displayContent[0].difficulty && (
+                  <Badge 
+                    variant={displayContent[0].difficulty === 'Beginner' ? 'default' : 
+                            displayContent[0].difficulty === 'Intermediate' ? 'secondary' : 'destructive'}
+                    className="text-sm"
+                  >
+                    {displayContent[0].difficulty}
+                  </Badge>
+                )}
+              </div>
+              <h1 className="text-3xl font-bold text-slate-900 mb-2">
+                {displayContent[0].title}
+              </h1>
+              <div className="flex items-center gap-4 text-sm text-slate-600">
+                <div className="flex items-center gap-1">
+                  <Clock className="h-4 w-4" />
+                  <span>{displayContent[0].durationMinutes ? `${displayContent[0].durationMinutes} min` : 'Self-paced'}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="prose prose-slate max-w-none">
+              <div className="whitespace-pre-wrap text-slate-700 leading-relaxed">
+                {displayContent[0].content}
+              </div>
+            </div>
+          </div>
+        ) : (
+          // Grid view for multiple contents
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {displayContent.map((content) => (
+              <Card key={content.id} className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge variant="secondary" className="text-xs">
+                          ATA {content.ataChapter}
                         </Badge>
-                      )}
-                      {content.difficulty && (
-                        <Badge 
-                          variant={content.difficulty === 'Beginner' ? 'default' : 
-                                  content.difficulty === 'Intermediate' ? 'secondary' : 'destructive'}
-                          className="text-xs"
-                        >
-                          {content.difficulty}
-                        </Badge>
-                      )}
+                        {content.subSection && (
+                          <Badge variant="outline" className="text-xs">
+                            {content.subSection}
+                          </Badge>
+                        )}
+                        {content.difficulty && (
+                          <Badge 
+                            variant={content.difficulty === 'Beginner' ? 'default' : 
+                                    content.difficulty === 'Intermediate' ? 'secondary' : 'destructive'}
+                            className="text-xs"
+                          >
+                            {content.difficulty}
+                          </Badge>
+                        )}
+                      </div>
+                      <CardTitle className="text-lg mb-1">{content.title}</CardTitle>
+                      <CardDescription className="text-sm text-slate-600">
+                        {content.subSection || `ATA Chapter ${content.ataChapter}`}
+                      </CardDescription>
                     </div>
-                    <CardTitle className="text-lg mb-1">{content.title}</CardTitle>
-                    <CardDescription className="text-sm text-slate-600">
-                      {content.subSection || `ATA Chapter ${content.ataChapter}`}
-                    </CardDescription>
                   </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-slate-700 mb-4 leading-relaxed line-clamp-3">
-                  {content.content.substring(0, 200)}...
-                </p>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm text-slate-500">
-                    <Clock className="h-4 w-4" />
-                    <span>{content.durationMinutes ? `${content.durationMinutes} min` : 'Self-paced'}</span>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-slate-700 mb-4 leading-relaxed line-clamp-3">
+                    {content.content.substring(0, 200)}...
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-sm text-slate-500">
+                      <Clock className="h-4 w-4" />
+                      <span>{content.durationMinutes ? `${content.durationMinutes} min` : 'Self-paced'}</span>
+                    </div>
+                    <Button size="sm">
+                      Start Learning
+                    </Button>
                   </div>
-                  <Button size="sm">
-                    Start Learning
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
 
-        {filteredContent.length === 0 && (
+        {displayContent.length === 0 && (
           <div className="text-center py-12">
             <p className="text-slate-500 text-lg">
-              {selectedChapter 
-                ? `No content found for ATA Chapter ${selectedChapter}.`
+              {selectedContent 
+                ? `No content found for the selected item.`
                 : 'No content found matching your criteria.'
               }
             </p>
             <p className="text-slate-400 text-sm mt-2">
-              {selectedChapter 
-                ? 'Try selecting a different chapter from the sidebar.'
+              {selectedContent 
+                ? 'Try selecting a different item from the sidebar.'
                 : 'Try adjusting your search or filter.'
               }
             </p>
@@ -215,7 +259,7 @@ export function ContentArea({ selectedChapter }: ContentAreaProps) {
         )}
 
         {/* Load More - only show when viewing all content */}
-        {!searchQuery && !selectedChapter && filteredContent.length > 0 && (
+        {!searchQuery && !selectedContent && displayContent.length > 0 && (
           <div className="text-center mt-8">
             <Button variant="outline" size="lg">
               Load More Content

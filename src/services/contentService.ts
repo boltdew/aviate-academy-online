@@ -147,6 +147,24 @@ export class ContentService {
     return result;
   }
 
+  static getSpecificContent(chapter: string, section: string, file: string): MarkdownContent | null {
+    console.log(`🎯 ContentService.getSpecificContent(${chapter}, ${section}, ${file})`);
+    const chapterContent = contentIndex[chapter];
+    if (!chapterContent || !chapterContent[section]) {
+      console.log(`❌ No content found for chapter ${chapter}, section ${section}`);
+      return null;
+    }
+    
+    const content = chapterContent[section].find(item => item.slug === file);
+    if (content) {
+      console.log(`✅ Found specific content: ${content.title}`);
+      return content;
+    } else {
+      console.log(`❌ No content found for file ${file} in chapter ${chapter}, section ${section}`);
+      return null;
+    }
+  }
+
   static getContentByChapterAndSection(ataChapter: string, subSection: string): MarkdownContent[] {
     return contentIndex[ataChapter]?.[subSection] || [];
   }
@@ -175,6 +193,56 @@ export class ContentService {
 
   static getChapterSections(ataChapter: string): string[] {
     return Object.keys(contentIndex[ataChapter] || {});
+  }
+
+  static getContentStructure() {
+    const structure: Record<string, { title: string; sections: Record<string, { files: Array<{ id: string; title: string; slug: string }> }> }> = {};
+    
+    // Chapter titles mapping
+    const chapterTitles: Record<string, string> = {
+      '21': 'Air Conditioning',
+      '22': 'Auto Flight',
+      '23': 'Communications',
+      '24': 'Electrical Power',
+      '25': 'Equipment and Furnishings',
+      '26': 'Fire Protection',
+      '27': 'Flight Controls',
+      '28': 'Fuel',
+      '29': 'Hydraulic Power',
+      '30': 'Ice and Rain Protection',
+      '31': 'Indicating-Recording Systems',
+      '32': 'Landing Gear',
+      '33': 'Lights',
+      '34': 'Navigation',
+      '35': 'Oxygen',
+      '38': 'Water-Waste',
+      '42': 'Integrated Modular Avionics',
+      '44': 'Cabin Systems',
+      '45': 'Central Maintenance System',
+      '46': 'Information Systems',
+      '47': 'Inert Gas System',
+      '49': 'Airborne Auxiliary Power',
+      '50': 'Cargo and Accessory Compartments'
+    };
+
+    Object.entries(contentIndex).forEach(([chapterCode, chapterData]) => {
+      structure[chapterCode] = {
+        title: chapterTitles[chapterCode] || `Chapter ${chapterCode}`,
+        sections: {}
+      };
+
+      Object.entries(chapterData).forEach(([sectionKey, sectionContent]) => {
+        structure[chapterCode].sections[sectionKey] = {
+          files: sectionContent.map(content => ({
+            id: content.id,
+            title: content.title,
+            slug: content.slug
+          }))
+        };
+      });
+    });
+
+    return structure;
   }
 
   static getContentStats() {
