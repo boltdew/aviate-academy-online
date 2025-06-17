@@ -18,6 +18,8 @@ import {
   UserCircle,
   ChevronRight,
   ChevronDown,
+  Folder,
+  FolderOpen,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useLocation } from "react-router-dom";
@@ -36,7 +38,7 @@ import { ContentService } from "@/services/contentService";
 
 const sidebarVariants = {
   open: {
-    width: "20rem",
+    width: "22rem",
   },
   closed: {
     width: "3.05rem",
@@ -83,8 +85,9 @@ interface AircraftSidebarProps {
 }
 
 export function AircraftSidebar({ selectedContent, onContentSelect }: AircraftSidebarProps) {
-  const [isCollapsed, setIsCollapsed] = useState(true);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const [expandedChapters, setExpandedChapters] = useState<Set<string>>(new Set());
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
   const location = useLocation();
   const pathname = location.pathname;
   const { user } = useUser();
@@ -107,6 +110,17 @@ export function AircraftSidebar({ selectedContent, onContentSelect }: AircraftSi
     setExpandedChapters(newExpanded);
   };
 
+  const toggleSection = (chapterCode: string, sectionKey: string) => {
+    const sectionId = `${chapterCode}-${sectionKey}`;
+    const newExpanded = new Set(expandedSections);
+    if (newExpanded.has(sectionId)) {
+      newExpanded.delete(sectionId);
+    } else {
+      newExpanded.add(sectionId);
+    }
+    setExpandedSections(newExpanded);
+  };
+
   const handleContentSelect = (chapter: string, section: string, file: string) => {
     const contentKey = { chapter, section, file };
     
@@ -124,7 +138,7 @@ export function AircraftSidebar({ selectedContent, onContentSelect }: AircraftSi
   return (
     <motion.div
       className={cn(
-        "sidebar fixed left-0 z-40 h-full shrink-0 border-r",
+        "sidebar fixed left-0 z-40 h-full shrink-0 border-r bg-white",
       )}
       initial={isCollapsed ? "closed" : "open"}
       animate={isCollapsed ? "closed" : "open"}
@@ -161,7 +175,7 @@ export function AircraftSidebar({ selectedContent, onContentSelect }: AircraftSi
                         {!isCollapsed && (
                           <>
                             <p className="text-sm font-medium">
-                              AeroLearn
+                              AeroLearn Docs
                             </p>
                             <ChevronsUpDown className="h-4 w-4 text-muted-foreground/50" />
                           </>
@@ -182,115 +196,118 @@ export function AircraftSidebar({ selectedContent, onContentSelect }: AircraftSi
             </div>
 
             <div className="flex h-full w-full flex-col">
-              <div className="flex grow flex-col gap-4">
-                <ScrollArea className="h-16 grow p-2">
+              <div className="flex grow flex-col gap-2">
+                <ScrollArea className="h-16 grow p-3">
                   <div className={cn("flex w-full flex-col gap-1")}>
                     {/* Navigation Items */}
                     <a
                       href="/dashboard"
                       className={cn(
-                        "flex h-8 w-full flex-row items-center rounded-md px-2 py-1.5 transition hover:bg-muted hover:text-primary",
+                        "flex h-7 w-full flex-row items-center rounded-md px-2 py-1.5 text-sm transition hover:bg-slate-100 hover:text-slate-900",
                         pathname?.includes("dashboard") &&
-                          "bg-muted text-blue-600",
+                          "bg-slate-100 text-slate-900 font-medium",
                       )}
                     >
                       <LayoutDashboard className="h-4 w-4" />
                       <motion.li variants={variants}>
                         {!isCollapsed && (
-                          <p className="ml-2 text-sm font-medium">Dashboard</p>
+                          <p className="ml-2 text-sm">Dashboard</p>
                         )}
                       </motion.li>
                     </a>
-                    
-                    <div className={cn(
-                      "flex h-8 w-full flex-row items-center rounded-md px-2 py-1.5 transition hover:bg-muted hover:text-primary cursor-pointer",
-                    )}>
-                      <Book className="h-4 w-4" />
-                      <motion.li variants={variants}>
-                        {!isCollapsed && (
-                          <p className="ml-2 text-sm font-medium">All Content</p>
-                        )}
-                      </motion.li>
-                    </div>
 
-                    <div className={cn(
-                      "flex h-8 w-full flex-row items-center rounded-md px-2 py-1.5 transition hover:bg-muted hover:text-primary cursor-pointer",
-                    )}>
-                      <User className="h-4 w-4" />
-                      <motion.li variants={variants}>
-                        {!isCollapsed && (
-                          <p className="ml-2 text-sm font-medium">My Progress</p>
-                        )}
-                      </motion.li>
-                    </div>
-
-                    <Separator className="w-full my-2" />
+                    <Separator className="w-full my-3" />
                     
                     {!isCollapsed && (
-                      <motion.div variants={variants} className="px-2 py-1">
-                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                          ATA Chapters
+                      <motion.div variants={variants} className="px-1 py-1">
+                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                          Aircraft Systems
                         </p>
                       </motion.div>
                     )}
 
                     {/* ATA Chapters with hierarchical structure */}
                     {Object.entries(contentStructure).map(([chapterCode, chapterData]) => {
-                      const isExpanded = expandedChapters.has(chapterCode);
+                      const isChapterExpanded = expandedChapters.has(chapterCode);
                       
                       return (
                         <div key={chapterCode} className="w-full">
                           {/* Chapter Header */}
                           <div
                             className={cn(
-                              "flex h-8 w-full flex-row items-center rounded-md px-2 py-1.5 transition hover:bg-muted hover:text-primary cursor-pointer",
+                              "flex h-7 w-full flex-row items-center rounded-md px-2 py-1.5 text-sm transition hover:bg-slate-100 hover:text-slate-900 cursor-pointer group",
                             )}
                             onClick={() => toggleChapter(chapterCode)}
                           >
-                            <span className="text-xs font-mono bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded min-w-[2rem] text-center">
+                            {isChapterExpanded ? (
+                              <ChevronDown className="h-3 w-3 mr-1 text-slate-500" />
+                            ) : (
+                              <ChevronRight className="h-3 w-3 mr-1 text-slate-500" />
+                            )}
+                            <span className="text-xs font-mono bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded min-w-[2.5rem] text-center mr-2">
                               {chapterCode}
                             </span>
                             <motion.li variants={variants} className="flex items-center justify-between w-full">
                               {!isCollapsed && (
-                                <>
-                                  <p className="ml-2 text-sm font-medium truncate">
-                                    {chapterData.title}
-                                  </p>
-                                  {isExpanded ? (
-                                    <ChevronDown className="h-3 w-3 ml-1" />
-                                  ) : (
-                                    <ChevronRight className="h-3 w-3 ml-1" />
-                                  )}
-                                </>
+                                <p className="text-sm text-slate-700 truncate font-medium">
+                                  {chapterData.title}
+                                </p>
                               )}
                             </motion.li>
                           </div>
 
                           {/* Chapter Sections */}
-                          {isExpanded && !isCollapsed && (
-                            <div className="ml-4 mt-1 space-y-1">
-                              {Object.entries(chapterData.sections).map(([sectionKey, sectionData]) => (
-                                <div key={sectionKey} className="space-y-1">
-                                  {sectionData.files.map((file) => (
+                          {isChapterExpanded && !isCollapsed && (
+                            <div className="ml-4 mt-1 space-y-1 border-l border-slate-200 pl-3">
+                              {Object.entries(chapterData.sections).map(([sectionKey, sectionData]) => {
+                                const sectionId = `${chapterCode}-${sectionKey}`;
+                                const isSectionExpanded = expandedSections.has(sectionId);
+                                
+                                return (
+                                  <div key={sectionKey} className="space-y-1">
+                                    {/* Section Header */}
                                     <div
-                                      key={file.id}
                                       className={cn(
-                                        "flex h-7 w-full flex-row items-center rounded-md px-2 py-1 transition hover:bg-muted hover:text-primary cursor-pointer text-sm",
-                                        selectedContent?.chapter === chapterCode && 
-                                        selectedContent?.section === sectionKey && 
-                                        selectedContent?.file === file.slug &&
-                                        "bg-muted text-blue-600",
+                                        "flex h-6 w-full flex-row items-center rounded-md px-2 py-1 transition hover:bg-slate-50 hover:text-slate-900 cursor-pointer text-sm",
                                       )}
-                                      onClick={() => handleContentSelect(chapterCode, sectionKey, file.slug)}
+                                      onClick={() => toggleSection(chapterCode, sectionKey)}
                                     >
-                                      <FileText className="h-3 w-3" />
-                                      <p className="ml-2 text-xs truncate">
-                                        {file.title}
+                                      {isSectionExpanded ? (
+                                        <FolderOpen className="h-3 w-3 mr-2 text-slate-400" />
+                                      ) : (
+                                        <Folder className="h-3 w-3 mr-2 text-slate-400" />
+                                      )}
+                                      <p className="text-xs text-slate-600 capitalize truncate">
+                                        {sectionKey}
                                       </p>
                                     </div>
-                                  ))}
-                                </div>
-                              ))}
+                                    
+                                    {/* Files in Section */}
+                                    {isSectionExpanded && (
+                                      <div className="ml-5 space-y-0.5 border-l border-slate-100 pl-3">
+                                        {sectionData.files.map((file) => (
+                                          <div
+                                            key={file.id}
+                                            className={cn(
+                                              "flex h-6 w-full flex-row items-center rounded-md px-2 py-1 transition hover:bg-blue-50 hover:text-blue-900 cursor-pointer text-sm",
+                                              selectedContent?.chapter === chapterCode && 
+                                              selectedContent?.section === sectionKey && 
+                                              selectedContent?.file === file.slug &&
+                                              "bg-blue-100 text-blue-900 font-medium",
+                                            )}
+                                            onClick={() => handleContentSelect(chapterCode, sectionKey, file.slug)}
+                                          >
+                                            <FileText className="h-3 w-3 mr-2 text-slate-400" />
+                                            <p className="text-xs truncate">
+                                              {file.title}
+                                            </p>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
                             </div>
                           )}
                         </div>
@@ -301,12 +318,12 @@ export function AircraftSidebar({ selectedContent, onContentSelect }: AircraftSi
               </div>
               
               {/* Footer */}
-              <div className="flex flex-col p-2">
-                <div className="mt-auto flex h-8 w-full flex-row items-center rounded-md px-2 py-1.5 transition hover:bg-muted hover:text-primary cursor-pointer">
+              <div className="flex flex-col p-2 border-t">
+                <div className="mt-auto flex h-8 w-full flex-row items-center rounded-md px-2 py-1.5 transition hover:bg-slate-100 hover:text-slate-900 cursor-pointer">
                   <Settings className="h-4 w-4 shrink-0" />
                   <motion.li variants={variants}>
                     {!isCollapsed && (
-                      <p className="ml-2 text-sm font-medium">Settings</p>
+                      <p className="ml-2 text-sm">Settings</p>
                     )}
                   </motion.li>
                 </div>
@@ -314,7 +331,7 @@ export function AircraftSidebar({ selectedContent, onContentSelect }: AircraftSi
                 <div>
                   <DropdownMenu modal={false}>
                     <DropdownMenuTrigger className="w-full">
-                      <div className="flex h-8 w-full flex-row items-center gap-2 rounded-md px-2 py-1.5 transition hover:bg-muted hover:text-primary">
+                      <div className="flex h-8 w-full flex-row items-center gap-2 rounded-md px-2 py-1.5 transition hover:bg-slate-100 hover:text-slate-900">
                         <Avatar className="size-4">
                           <AvatarFallback>
                             {user?.firstName?.charAt(0) || user?.emailAddresses[0]?.emailAddress?.charAt(0) || "U"}
@@ -326,10 +343,10 @@ export function AircraftSidebar({ selectedContent, onContentSelect }: AircraftSi
                         >
                           {!isCollapsed && (
                             <>
-                              <p className="text-sm font-medium">
+                              <p className="text-sm">
                                 {user?.firstName || "User"}
                               </p>
-                              <ChevronsUpDown className="ml-auto h-4 w-4 text-muted-foreground/50" />
+                              <ChevronsUpDown className="ml-auto h-4 w-4 text-slate-400" />
                             </>
                           )}
                         </motion.li>
