@@ -33,15 +33,22 @@ export function ContentArea({ selectedChapter }: ContentAreaProps) {
     
     let content: MarkdownContent[] = [];
     
+    // Priority: if a chapter is selected, show ONLY that chapter's content
     if (selectedChapter) {
       content = ContentService.getContentByChapter(selectedChapter);
-    } else if (searchQuery) {
+      console.log(`📋 Showing content for chapter ${selectedChapter}: ${content.length} items`);
+    } 
+    // If searching but no chapter selected, show search results
+    else if (searchQuery.trim()) {
       content = ContentService.searchContent(searchQuery);
-    } else {
-      content = ContentService.getAllContent().slice(0, 8); // Show first 8 for performance
+      console.log(`🔍 Search results for "${searchQuery}": ${content.length} items`);
+    } 
+    // Default: show overview of all content (limited for performance)
+    else {
+      content = ContentService.getAllContent().slice(0, 8);
+      console.log(`📚 Showing overview: ${content.length} items`);
     }
     
-    console.log(`✅ Filtered content result: ${content.length} items`);
     return content;
   }, [searchQuery, selectedChapter]);
 
@@ -62,8 +69,15 @@ export function ContentArea({ selectedChapter }: ContentAreaProps) {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-6">
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">Learning Content</h2>
-          <p className="text-slate-600">Access your comprehensive aircraft engineering materials organized by ATA chapters</p>
+          <h2 className="text-2xl font-bold text-slate-900 mb-2">
+            {selectedChapter ? `ATA Chapter ${selectedChapter} Content` : 'Learning Content'}
+          </h2>
+          <p className="text-slate-600">
+            {selectedChapter 
+              ? `Browse all materials for ATA Chapter ${selectedChapter}` 
+              : 'Access your comprehensive aircraft engineering materials organized by ATA chapters'
+            }
+          </p>
         </div>
 
         {/* Search and Filter Bar */}
@@ -71,7 +85,7 @@ export function ContentArea({ selectedChapter }: ContentAreaProps) {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
             <Input 
-              placeholder="Search content, chapters, or topics..." 
+              placeholder={selectedChapter ? `Search within ATA ${selectedChapter}...` : "Search content, chapters, or topics..."} 
               className="pl-10"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -80,49 +94,56 @@ export function ContentArea({ selectedChapter }: ContentAreaProps) {
           <div className="flex items-center gap-2">
             {selectedChapter && (
               <Badge variant="secondary" className="text-sm">
-                Filtered by ATA {selectedChapter}
+                ATA Chapter {selectedChapter}
+              </Badge>
+            )}
+            {searchQuery && (
+              <Badge variant="outline" className="text-sm">
+                Search: "{searchQuery}"
               </Badge>
             )}
           </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Modules</CardTitle>
-              <BookOpen className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalContent.toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground">Across {stats.chapters} ATA chapters</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Beginner Content</CardTitle>
-              <Award className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.difficulties.Beginner || 0}</div>
-              <p className="text-xs text-muted-foreground">Easy to start modules</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Advanced Content</CardTitle>
-              <Clock className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.difficulties.Advanced || 0}</div>
-              <p className="text-xs text-muted-foreground">Expert level modules</p>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Show stats only when no specific chapter is selected */}
+        {!selectedChapter && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total Modules</CardTitle>
+                <BookOpen className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.totalContent.toLocaleString()}</div>
+                <p className="text-xs text-muted-foreground">Across {stats.chapters} ATA chapters</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Beginner Content</CardTitle>
+                <Award className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.difficulties.Beginner || 0}</div>
+                <p className="text-xs text-muted-foreground">Easy to start modules</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Advanced Content</CardTitle>
+                <Clock className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.difficulties.Advanced || 0}</div>
+                <p className="text-xs text-muted-foreground">Expert level modules</p>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         {/* Debug Info */}
         <div className="mb-4 p-2 bg-blue-50 rounded text-sm">
-          <p><strong>Debug:</strong> Total content: {stats.totalContent}, Chapters: {availableChapters.join(', ')}, Filtered: {filteredContent.length}</p>
+          <p><strong>Debug:</strong> Selected: {selectedChapter || 'None'}, Search: "{searchQuery}", Results: {filteredContent.length}</p>
         </div>
 
         {/* Content Grid */}
@@ -178,13 +199,23 @@ export function ContentArea({ selectedChapter }: ContentAreaProps) {
 
         {filteredContent.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-slate-500 text-lg">No content found matching your criteria.</p>
-            <p className="text-slate-400 text-sm mt-2">Try adjusting your search or filter.</p>
+            <p className="text-slate-500 text-lg">
+              {selectedChapter 
+                ? `No content found for ATA Chapter ${selectedChapter}.`
+                : 'No content found matching your criteria.'
+              }
+            </p>
+            <p className="text-slate-400 text-sm mt-2">
+              {selectedChapter 
+                ? 'Try selecting a different chapter from the sidebar.'
+                : 'Try adjusting your search or filter.'
+              }
+            </p>
           </div>
         )}
 
-        {/* Load More */}
-        {!searchQuery && !selectedChapter && (
+        {/* Load More - only show when viewing all content */}
+        {!searchQuery && !selectedChapter && filteredContent.length > 0 && (
           <div className="text-center mt-8">
             <Button variant="outline" size="lg">
               Load More Content
