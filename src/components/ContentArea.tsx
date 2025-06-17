@@ -1,10 +1,11 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Search, Filter, BookOpen, Clock, Award } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ContentService } from "@/services/contentService";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import type { MarkdownContent } from "@/types/content";
 
 interface ContentAreaProps {
@@ -13,11 +14,23 @@ interface ContentAreaProps {
 
 export function ContentArea({ selectedChapter }: ContentAreaProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Ensure content is initialized
+  useEffect(() => {
+    const initContent = async () => {
+      await ContentService.ensureInitialized();
+      setIsLoading(false);
+    };
+    initContent();
+  }, []);
   
   const stats = ContentService.getContentStats();
   const availableChapters = ContentService.getAvailableChapters();
   
   const filteredContent = useMemo(() => {
+    console.log(`🔄 Filtering content with selectedChapter: ${selectedChapter}, searchQuery: "${searchQuery}"`);
+    
     let content: MarkdownContent[] = [];
     
     if (selectedChapter) {
@@ -28,8 +41,21 @@ export function ContentArea({ selectedChapter }: ContentAreaProps) {
       content = ContentService.getAllContent().slice(0, 8); // Show first 8 for performance
     }
     
+    console.log(`✅ Filtered content result: ${content.length} items`);
     return content;
   }, [searchQuery, selectedChapter]);
+
+  if (isLoading) {
+    return (
+      <div className="flex-1 p-6 bg-slate-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center py-12">
+            <p className="text-slate-500 text-lg">Loading content...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 p-6 bg-slate-50">
@@ -92,6 +118,11 @@ export function ContentArea({ selectedChapter }: ContentAreaProps) {
               <p className="text-xs text-muted-foreground">Expert level modules</p>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Debug Info */}
+        <div className="mb-4 p-2 bg-blue-50 rounded text-sm">
+          <p><strong>Debug:</strong> Total content: {stats.totalContent}, Chapters: {availableChapters.join(', ')}, Filtered: {filteredContent.length}</p>
         </div>
 
         {/* Content Grid */}
