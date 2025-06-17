@@ -5,36 +5,41 @@ import type { MarkdownContent, ContentIndex } from '@/types/content';
 let contentIndex: ContentIndex = {};
 let allContent: MarkdownContent[] = [];
 
-// Try to import the virtual modules, with fallbacks
-try {
-  // These imports will work after the plugin processes the content
-  const indexModule = await import('virtual:content-index');
-  const allContentModule = await import('virtual:all-content');
-  contentIndex = indexModule.default || {};
-  allContent = allContentModule.default || [];
-} catch (error) {
-  console.log('Virtual content modules not available yet, using fallbacks');
-  // Fallback to sample data for development
-  const sampleContent: MarkdownContent = {
-    id: '29-basics-principles',
-    title: 'Hydraulic System Principles',
-    slug: 'principles',
-    ataChapter: '29',
-    subSection: 'basics',
-    content: 'Sample hydraulic system content...',
-    frontmatter: { title: 'Hydraulic System Principles', difficulty: 'Beginner' },
-    difficulty: 'Beginner',
-    durationMinutes: 30,
-    filePath: '29/basics/principles.md'
-  };
-  
-  allContent = [sampleContent];
-  contentIndex = {
-    '29': {
-      'basics': [sampleContent]
-    }
-  };
-}
+// Initialize content asynchronously
+const initializeContent = async () => {
+  try {
+    // These imports will work after the plugin processes the content
+    const indexModule = await import('virtual:content-index');
+    const allContentModule = await import('virtual:all-content');
+    contentIndex = indexModule.default || {};
+    allContent = allContentModule.default || [];
+  } catch (error) {
+    console.log('Virtual content modules not available yet, using fallbacks');
+    // Fallback to sample data for development
+    const sampleContent: MarkdownContent = {
+      id: '29-basics-principles',
+      title: 'Hydraulic System Principles',
+      slug: 'principles',
+      ataChapter: '29',
+      subSection: 'basics',
+      content: 'Sample hydraulic system content...',
+      frontmatter: { title: 'Hydraulic System Principles', difficulty: 'Beginner' },
+      difficulty: 'Beginner',
+      durationMinutes: 30,
+      filePath: '29/basics/principles.md'
+    };
+    
+    allContent = [sampleContent];
+    contentIndex = {
+      '29': {
+        'basics': [sampleContent]
+      }
+    };
+  }
+};
+
+// Initialize content immediately
+initializeContent();
 
 export class ContentService {
   private static contentIndex: ContentIndex = contentIndex;
