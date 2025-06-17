@@ -17,19 +17,3 @@ export interface ContentIndex {
     [subSection: string]: MarkdownContent[];
   };
 }
-
-// Virtual module declarations
-declare module 'virtual:content-index' {
-  const contentIndex: ContentIndex;
-  export default contentIndex;
-}
-
-declare module 'virtual:all-content' {
-  const allContent: MarkdownContent[];
-  export default allContent;
-}
-
-declare module 'virtual:content/*' {
-  const content: MarkdownContent[];
-  export default content;
-}
