@@ -1,4 +1,3 @@
-
 "use client";
 
 import { cn } from "@/lib/utils";
@@ -29,6 +28,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
+import { useUser, useClerk } from "@clerk/clerk-react";
 
 const sidebarVariants = {
   open: {
@@ -62,10 +62,9 @@ const variants = {
 };
 
 const transitionProps = {
-  type: "tween",
+  type: "tween" as const,
   ease: "easeOut",
   duration: 0.2,
-  staggerChildren: 0.1,
 };
 
 const staggerVariants = {
@@ -103,6 +102,12 @@ export function AircraftSidebar() {
   const [activeChapter, setActiveChapter] = useState<string | null>(null);
   const location = useLocation();
   const pathname = location.pathname;
+  const { user } = useUser();
+  const { signOut } = useClerk();
+
+  const handleSignOut = () => {
+    signOut();
+  };
 
   return (
     <motion.div
@@ -256,7 +261,7 @@ export function AircraftSidebar() {
                       <div className="flex h-8 w-full flex-row items-center gap-2 rounded-md px-2 py-1.5 transition hover:bg-muted hover:text-primary">
                         <Avatar className="size-4">
                           <AvatarFallback>
-                            U
+                            {user?.firstName?.charAt(0) || user?.emailAddresses[0]?.emailAddress?.charAt(0) || "U"}
                           </AvatarFallback>
                         </Avatar>
                         <motion.li
@@ -265,7 +270,9 @@ export function AircraftSidebar() {
                         >
                           {!isCollapsed && (
                             <>
-                              <p className="text-sm font-medium">User</p>
+                              <p className="text-sm font-medium">
+                                {user?.firstName || "User"}
+                              </p>
                               <ChevronsUpDown className="ml-auto h-4 w-4 text-muted-foreground/50" />
                             </>
                           )}
@@ -276,15 +283,15 @@ export function AircraftSidebar() {
                       <div className="flex flex-row items-center gap-2 p-2">
                         <Avatar className="size-6">
                           <AvatarFallback>
-                            U
+                            {user?.firstName?.charAt(0) || user?.emailAddresses[0]?.emailAddress?.charAt(0) || "U"}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col text-left">
                           <span className="text-sm font-medium">
-                            User
+                            {user?.fullName || "User"}
                           </span>
                           <span className="line-clamp-1 text-xs text-muted-foreground">
-                            user@aerolearn.com
+                            {user?.emailAddresses[0]?.emailAddress || "user@aerolearn.com"}
                           </span>
                         </div>
                       </div>
@@ -292,7 +299,10 @@ export function AircraftSidebar() {
                       <DropdownMenuItem className="flex items-center gap-2">
                         <UserCircle className="h-4 w-4" /> Profile
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="flex items-center gap-2">
+                      <DropdownMenuItem 
+                        className="flex items-center gap-2"
+                        onClick={handleSignOut}
+                      >
                         <LogOut className="h-4 w-4" /> Sign out
                       </DropdownMenuItem>
                     </DropdownMenuContent>
