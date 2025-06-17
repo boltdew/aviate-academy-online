@@ -98,9 +98,13 @@ const ataChapters = [
   { code: "80", title: "Starting" }
 ];
 
-export function AircraftSidebar() {
+interface AircraftSidebarProps {
+  selectedChapter: string | null;
+  onChapterSelect: (chapter: string | null) => void;
+}
+
+export function AircraftSidebar({ selectedChapter, onChapterSelect }: AircraftSidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(true);
-  const [activeChapter, setActiveChapter] = useState<string | null>(null);
   const location = useLocation();
   const pathname = location.pathname;
   const { user } = useUser();
@@ -108,6 +112,15 @@ export function AircraftSidebar() {
 
   const handleSignOut = () => {
     signOut();
+  };
+
+  const handleChapterClick = (chapterCode: string) => {
+    // Toggle chapter selection - if already selected, deselect it
+    if (selectedChapter === chapterCode) {
+      onChapterSelect(null);
+    } else {
+      onChapterSelect(chapterCode);
+    }
   };
 
   return (
@@ -226,9 +239,9 @@ export function AircraftSidebar() {
                         key={chapter.code}
                         className={cn(
                           "flex h-8 w-full flex-row items-center rounded-md px-2 py-1.5 transition hover:bg-muted hover:text-primary cursor-pointer",
-                          activeChapter === chapter.code && "bg-muted text-blue-600",
+                          selectedChapter === chapter.code && "bg-muted text-blue-600",
                         )}
-                        onClick={() => setActiveChapter(chapter.code)}
+                        onClick={() => handleChapterClick(chapter.code)}
                       >
                         <span className="text-xs font-mono bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded min-w-[2rem] text-center">
                           {chapter.code}

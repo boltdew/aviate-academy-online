@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,9 +7,12 @@ import { ContentService } from "@/services/contentService";
 import { useState, useMemo } from "react";
 import type { MarkdownContent } from "@/types/content";
 
-export function ContentArea() {
+interface ContentAreaProps {
+  selectedChapter: string | null;
+}
+
+export function ContentArea({ selectedChapter }: ContentAreaProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedChapter, setSelectedChapter] = useState<string | null>(null);
   
   const stats = ContentService.getContentStats();
   const availableChapters = ContentService.getAvailableChapters();
@@ -46,25 +48,16 @@ export function ContentArea() {
               placeholder="Search content, chapters, or topics..." 
               className="pl-10"
               value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setSelectedChapter(null);
-              }}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <select 
-            className="px-3 py-2 border border-gray-300 rounded-md"
-            value={selectedChapter || ""}
-            onChange={(e) => {
-              setSelectedChapter(e.target.value || null);
-              setSearchQuery("");
-            }}
-          >
-            <option value="">All Chapters</option>
-            {availableChapters.map(chapter => (
-              <option key={chapter} value={chapter}>ATA {chapter}</option>
-            ))}
-          </select>
+          <div className="flex items-center gap-2">
+            {selectedChapter && (
+              <Badge variant="secondary" className="text-sm">
+                Filtered by ATA {selectedChapter}
+              </Badge>
+            )}
+          </div>
         </div>
 
         {/* Stats Cards */}
