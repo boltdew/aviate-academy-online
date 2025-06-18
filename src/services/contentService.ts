@@ -1,10 +1,50 @@
-
 import type { MarkdownContent, ContentIndex } from '@/types/content';
 
 // Initialize with fallback data
 let contentIndex: ContentIndex = {};
 let allContent: MarkdownContent[] = [];
 let isInitialized = false;
+
+// Simple markdown to HTML converter
+const parseMarkdown = (markdown: string): string => {
+  // Remove frontmatter (content between --- at the start)
+  let content = markdown.replace(/^---[\s\S]*?---\n/, '');
+  
+  // Convert markdown to HTML
+  content = content
+    // Headers
+    .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+    .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+    .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+    // Bold and italic
+    .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
+    .replace(/\*(.*)\*/gim, '<em>$1</em>')
+    // Code blocks
+    .replace(/```([\s\S]*?)```/gim, '<pre><code>$1</code></pre>')
+    // Inline code
+    .replace(/`([^`]*)`/gim, '<code>$1</code>')
+    // Lists
+    .replace(/^\* (.*$)/gim, '<li>$1</li>')
+    .replace(/^- (.*$)/gim, '<li>$1</li>')
+    // Blockquotes
+    .replace(/^> (.*$)/gim, '<blockquote>$1</blockquote>')
+    // Line breaks
+    .replace(/\n\n/gim, '</p><p>')
+    // Wrap in paragraphs
+    .replace(/^(?!<[h|l|b|p])/gim, '<p>')
+    .replace(/$/gim, '</p>')
+    // Clean up empty paragraphs
+    .replace(/<p><\/p>/gim, '')
+    // Fix list wrapping
+    .replace(/<p>(<li>.*<\/li>)<\/p>/gim, '<ul>$1</ul>')
+    .replace(/<\/li><li>/gim, '</li><li>')
+    // Fix blockquote wrapping
+    .replace(/<p>(<blockquote>.*<\/blockquote>)<\/p>/gim, '$1')
+    // Fix code block wrapping
+    .replace(/<p>(<pre><code>[\s\S]*?<\/code><\/pre>)<\/p>/gim, '$1');
+
+  return content;
+};
 
 // Create some sample data as fallback
 const createSampleData = () => {
@@ -15,7 +55,54 @@ const createSampleData = () => {
       slug: 'introduction',
       ataChapter: '21',
       subSection: 'basics',
-      content: 'Aircraft air conditioning systems are essential for maintaining a comfortable and safe environment...',
+      content: parseMarkdown(`# Air Conditioning System Introduction
+
+## Overview
+
+Aircraft air conditioning systems are essential for maintaining a comfortable and safe environment for passengers and crew during flight. These systems control temperature, humidity, and air quality within the aircraft cabin.
+
+## Key Functions
+
+### Temperature Control
+- Maintain comfortable cabin temperature
+- Adapt to varying external conditions
+- Provide heating and cooling as needed
+
+### Air Quality Management
+- Filter incoming air
+- Control humidity levels
+- Ensure adequate ventilation
+
+## System Components
+
+### Air Cycle Machine (ACM)
+The heart of the air conditioning system that:
+- Compresses incoming air
+- Cools the air through expansion
+- Removes moisture from the air
+
+### Heat Exchangers
+- Primary heat exchanger
+- Secondary heat exchanger
+- Intercooler
+
+## Operating Principles
+
+The air conditioning system operates on the air cycle refrigeration principle, using compressed air from the engine compressor stages. This air is cooled, dried, and distributed throughout the cabin.
+
+## Safety Considerations
+
+⚠️ **Important**: Always follow proper procedures when:
+- Servicing air conditioning components
+- Checking system pressures
+- Performing maintenance tasks
+
+## Next Steps
+
+Continue with:
+- System components in detail
+- Troubleshooting procedures
+- Maintenance practices`),
       frontmatter: { title: 'Air Conditioning System Introduction', difficulty: 'Beginner', duration: 25 },
       difficulty: 'Beginner',
       durationMinutes: 25,
@@ -27,7 +114,55 @@ const createSampleData = () => {
       slug: 'distribution',
       ataChapter: '21',
       subSection: 'systems',
-      content: 'The air distribution system ensures that conditioned air reaches all areas of the aircraft cabin...',
+      content: parseMarkdown(`# Air Distribution Systems
+
+## Distribution Network
+
+The air distribution system ensures that conditioned air reaches all areas of the aircraft cabin efficiently and evenly.
+
+## Main Distribution Components
+
+### Distribution Manifolds
+- Primary distribution manifold
+- Secondary distribution lines
+- Individual cabin outlets
+
+### Flow Control Valves
+- Temperature control valves
+- Volume control dampers
+- Emergency shutoff valves
+
+## Cabin Zones
+
+### Passenger Cabin
+- Overhead distribution
+- Under-seat return air
+- Individual passenger controls
+
+### Flight Deck
+- Dedicated temperature control
+- Independent air supply
+- Enhanced filtration
+
+### Cargo Compartments
+- Temperature monitoring
+- Humidity control for sensitive cargo
+- Emergency ventilation systems
+
+## Air Flow Patterns
+
+Understanding proper air flow ensures:
+- Even temperature distribution
+- Adequate air exchange rates
+- Minimal contamination spread
+
+## Maintenance Points
+
+Regular inspection of:
+- Distribution ducting
+- Outlet grilles and filters
+- Control valve operation
+- Temperature sensors`),
       frontmatter: { title: 'Air Distribution Systems', difficulty: 'Intermediate', duration: 35 },
       difficulty: 'Intermediate',
       durationMinutes: 35,
@@ -104,6 +239,13 @@ const initializeContent = async () => {
     if (indexModule.default && Object.keys(indexModule.default).length > 0) {
       contentIndex = indexModule.default;
       allContent = allContentModule.default || [];
+      
+      // Parse markdown content for all items
+      allContent = allContent.map(item => ({
+        ...item,
+        content: parseMarkdown(item.content)
+      }));
+      
       console.log(`✅ Loaded ${allContent.length} content items from virtual modules`);
     } else {
       throw new Error('Virtual modules are empty');
