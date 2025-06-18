@@ -1,0 +1,99 @@
+
+@layer utilities {
+  /* Material 3 Elevation */
+  .shadow-elevation-1 {
+    box-shadow: var(--mio-theme-elevation-1);
+  }
+  
+  .shadow-elevation-2 {
+    box-shadow: var(--mio-theme-elevation-2);
+  }
+  
+  .shadow-elevation-3 {
+    box-shadow: var(--mio-theme-elevation-3);
+  }
+  
+  /* Material 3 Surface Colors */
+  .bg-surface {
+    background-color: hsl(var(--surface));
+  }
+  
+  .bg-surface-container-lowest {
+    background-color: hsl(var(--surface-container-lowest));
+  }
+  
+  .bg-surface-container {
+    background-color: hsl(var(--surface-container));
+  }
+  
+  .bg-surface-container-high {
+    background-color: hsl(var(--surface-container-high));
+  }
+  
+  .bg-surface-container-highest {
+    background-color: hsl(var(--surface-container-highest));
+  }
+  
+  .bg-surface-variant {
+    background-color: hsl(var(--surface-variant));
+  }
+  
+  .bg-primary-container {
+    background-color: hsl(var(--primary-container));
+  }
+  
+  .bg-secondary-container {
+    background-color: hsl(var(--secondary-container));
+  }
+  
+  .bg-tertiary-container {
+    background-color: hsl(var(--tertiary-container));
+  }
+  
+  /* Text Colors */
+  .text-on-surface {
+    color: hsl(var(--on-surface));
+  }
+  
+  .text-on-surface-variant {
+    color: hsl(var(--on-surface-variant));
+  }
+  
+  .text-on-primary-container {
+    color: hsl(var(--on-primary-container));
+  }
+  
+  .text-on-secondary-container {
+    color: hsl(var(--on-secondary-container));
+  }
+  
+  .text-on-tertiary-container {
+    color: hsl(var(--on-tertiary-container));
+  }
+  
+  .text-primary {
+    color: hsl(var(--primary));
+  }
+  
+  .text-secondary {
+    color: hsl(var(--secondary));
+  }
+  
+  .text-tertiary {
+    color: hsl(var(--tertiary));
+  }
+  
+  /* Border Colors */
+  .border-outline {
+    border-color: hsl(var(--outline));
+  }
+  
+  .border-outline-variant {
+    border-color: hsl(var(--outline-variant));
+  }
+  
+  /* Background Colors for Outline Variants */
+  .bg-outline-variant {
+    background-color: hsl(var(--outline-variant));
+  }
+}
