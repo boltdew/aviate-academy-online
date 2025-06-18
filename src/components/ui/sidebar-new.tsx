@@ -67,11 +67,15 @@ export const SidebarNew = ({
   );
 };
 
-export const SidebarBody = (props: React.ComponentProps<typeof motion.div>) => {
+export const SidebarBody = ({ 
+  className, 
+  children, 
+  ...props 
+}: React.HTMLAttributes<HTMLDivElement>) => {
   return (
     <>
-      <DesktopSidebar {...props} />
-      <MobileSidebar {...(props as React.ComponentProps<"div">)} />
+      <DesktopSidebar className={className} {...props}>{children}</DesktopSidebar>
+      <MobileSidebar className={className} {...props}>{children}</MobileSidebar>
     </>
   );
 };
@@ -80,7 +84,7 @@ export const DesktopSidebar = ({
   className,
   children,
   ...props
-}: React.ComponentProps<typeof motion.div>) => {
+}: React.HTMLAttributes<HTMLDivElement>) => {
   const { open, setOpen, animate } = useSidebarNew();
   return (
     <>
@@ -106,7 +110,7 @@ export const MobileSidebar = ({
   className,
   children,
   ...props
-}: React.ComponentProps<"div">) => {
+}: React.HTMLAttributes<HTMLDivElement>) => {
   const { open, setOpen } = useSidebarNew();
   return (
     <>
@@ -189,8 +193,7 @@ export const SidebarLink = ({
 }: {
   link: Links;
   className?: string;
-  props?: LinkProps;
-}) => {
+} & React.HTMLAttributes<HTMLDivElement>) => {
   const { open, animate } = useSidebarNew();
   return (
     <div
@@ -214,6 +217,3 @@ export const SidebarLink = ({
     </div>
   );
 };
-
-// Define LinkProps interface
-interface LinkProps extends React.ComponentProps<"div"> {}
