@@ -18,7 +18,7 @@ export function ContentArea({ selectedContent }: ContentAreaProps) {
 
   return (
     <ErrorBoundary>
-      <div className="flex-1 overflow-auto bg-gray-50 dark:bg-neutral-900">
+      <div className="flex-1 overflow-auto bg-surface-container-lowest">
         <Suspense fallback={<LoadingScreen />}>
           {selectedContent ? (
             <SpecificContentView selectedContent={selectedContent} />
@@ -44,13 +44,13 @@ function SpecificContentView({ selectedContent }: { selectedContent: { chapter: 
     console.log("❌ Content not found");
     return (
       <div className="flex items-center justify-center h-full">
-        <Card className="max-w-md">
+        <Card className="max-w-md bg-surface-container border-outline">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-on-surface">
               <FileText className="h-5 w-5" />
               Content Not Found
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-on-surface-variant">
               The requested content could not be loaded.
             </CardDescription>
           </CardHeader>
@@ -69,25 +69,25 @@ function SpecificContentView({ selectedContent }: { selectedContent: { chapter: 
       transition={{ duration: 0.3 }}
       className="max-w-4xl mx-auto p-6"
     >
-      <Card className="shadow-sm">
+      <Card className="bg-surface-container border-outline shadow-elevation-1">
         <CardHeader className="space-y-4">
           <div className="flex items-start justify-between">
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <Badge variant="secondary" className="font-mono">
+                <Badge variant="secondary" className="font-mono bg-secondary-container text-on-secondary-container">
                   ATA {selectedContent.chapter}
                 </Badge>
-                <Badge variant="outline" className="capitalize">
+                <Badge variant="outline" className="capitalize border-outline text-on-surface-variant bg-surface-variant">
                   {selectedContent.section}
                 </Badge>
               </div>
-              <CardTitle className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+              <CardTitle className="text-2xl font-bold text-on-surface headline-large">
                 {content.title}
               </CardTitle>
             </div>
           </div>
           
-          <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+          <div className="flex items-center gap-4 text-sm text-on-surface-variant body-medium">
             <div className="flex items-center gap-1">
               <Clock className="h-4 w-4" />
               <span>Last updated: {new Date().toLocaleDateString()}</span>
@@ -99,11 +99,11 @@ function SpecificContentView({ selectedContent }: { selectedContent: { chapter: 
           </div>
         </CardHeader>
         
-        <Separator />
+        <Separator className="bg-outline-variant" />
         
         <CardContent className="p-6">
           <div 
-            className="prose prose-gray dark:prose-invert max-w-none prose-headings:text-gray-900 dark:prose-headings:text-gray-100 prose-p:text-gray-700 dark:prose-p:text-gray-300"
+            className="prose prose-gray max-w-none text-on-surface body-large"
             dangerouslySetInnerHTML={{ __html: content.content }}
           />
         </CardContent>
@@ -118,7 +118,7 @@ function DashboardOverview() {
   console.log(`📚 Showing overview: ${allContent.length} items`);
 
   const stats = ContentService.getContentStats();
-  console.log(`📊 Content stats: ${stats.totalItems} total, ${stats.totalChapters} chapters`);
+  console.log(`📊 Content stats: ${stats.totalContent} total, ${stats.chapters} chapters`);
 
   return (
     <motion.div
@@ -129,52 +129,52 @@ function DashboardOverview() {
     >
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+          <h2 className="text-3xl font-bold text-on-surface headline-large mb-2">
             Aircraft Engineering Documentation
           </h2>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-on-surface-variant body-large">
             Comprehensive technical documentation following ATA specifications
           </p>
         </div>
 
-        {/* Statistics Cards */}
+        {/* Statistics Cards - Material 3 Style */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <Card>
+          <Card className="bg-primary-container border-outline shadow-elevation-1">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Documents</CardTitle>
-              <FileText className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium text-on-primary-container label-large">Total Documents</CardTitle>
+              <FileText className="h-5 w-5 text-primary" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalItems}</div>
-              <p className="text-xs text-muted-foreground">
+              <div className="text-3xl font-bold text-on-primary-container display-small">{stats.totalContent}</div>
+              <p className="text-xs text-on-primary-container/70 body-small">
                 Technical documents available
               </p>
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="bg-secondary-container border-outline shadow-elevation-1">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">ATA Chapters</CardTitle>
-              <BookOpen className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium text-on-secondary-container label-large">ATA Chapters</CardTitle>
+              <BookOpen className="h-5 w-5 text-secondary" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalChapters}</div>
-              <p className="text-xs text-muted-foreground">
+              <div className="text-3xl font-bold text-on-secondary-container display-small">{stats.chapters}</div>
+              <p className="text-xs text-on-secondary-container/70 body-small">
                 System categories covered
               </p>
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="bg-tertiary-container border-outline shadow-elevation-1">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Coverage</CardTitle>
-              <Badge className="h-4 w-4 rounded-full" />
+              <CardTitle className="text-sm font-medium text-on-tertiary-container label-large">Coverage</CardTitle>
+              <div className="w-5 h-5 rounded-full bg-tertiary" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {Math.round((stats.totalChapters / 50) * 100)}%
+              <div className="text-3xl font-bold text-on-tertiary-container display-small">
+                {Math.round((stats.chapters / 50) * 100)}%
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-on-tertiary-container/70 body-small">
                 Of ATA specification
               </p>
             </CardContent>
@@ -182,10 +182,10 @@ function DashboardOverview() {
         </div>
 
         {/* Content Overview */}
-        <Card>
+        <Card className="bg-surface-container border-outline shadow-elevation-1">
           <CardHeader>
-            <CardTitle>Available Documentation</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-on-surface headline-small">Available Documentation</CardTitle>
+            <CardDescription className="text-on-surface-variant body-medium">
               Select a document from the sidebar to begin reading
             </CardDescription>
           </CardHeader>
@@ -194,32 +194,33 @@ function DashboardOverview() {
               <div className="grid gap-3">
                 {Object.entries(
                   allContent.reduce((acc, item) => {
-                    if (!acc[item.chapter]) {
-                      acc[item.chapter] = [];
+                    const chapterCode = item.slug.split('-')[0] || 'unknown';
+                    if (!acc[chapterCode]) {
+                      acc[chapterCode] = [];
                     }
-                    acc[item.chapter].push(item);
+                    acc[chapterCode].push(item);
                     return acc;
                   }, {} as Record<string, typeof allContent>)
                 ).map(([chapter, items]) => (
-                  <div key={chapter} className="border rounded-lg p-4">
+                  <div key={chapter} className="border border-outline rounded-xl p-4 bg-surface-variant">
                     <div className="flex items-center gap-2 mb-2">
-                      <Badge variant="secondary" className="font-mono">
+                      <Badge variant="secondary" className="font-mono bg-secondary-container text-on-secondary-container">
                         ATA {chapter}
                       </Badge>
-                      <span className="font-medium text-gray-900 dark:text-gray-100">
-                        {items[0]?.chapterTitle || `Chapter ${chapter}`}
+                      <span className="font-medium text-on-surface-variant title-medium">
+                        {items[0]?.title?.split(' ').slice(0, 3).join(' ') || `Chapter ${chapter}`}
                       </span>
                     </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                    <div className="text-sm text-on-surface-variant/70 body-small">
                       {items.length} document{items.length !== 1 ? 's' : ''} available
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+              <div className="text-center py-8 text-on-surface-variant">
                 <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>No content available at the moment.</p>
+                <p className="body-large">No content available at the moment.</p>
               </div>
             )}
           </CardContent>

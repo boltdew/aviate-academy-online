@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -19,19 +20,51 @@ export default {
 		},
 		extend: {
 			colors: {
+				// Material 3 Color System
+				primary: {
+					DEFAULT: 'hsl(var(--primary))',
+					foreground: 'hsl(var(--on-primary))',
+					container: 'hsl(var(--primary-container))',
+					'container-foreground': 'hsl(var(--on-primary-container))',
+				},
+				secondary: {
+					DEFAULT: 'hsl(var(--secondary))',
+					foreground: 'hsl(var(--on-secondary))',
+					container: 'hsl(var(--secondary-container))',
+					'container-foreground': 'hsl(var(--on-secondary-container))',
+				},
+				tertiary: {
+					DEFAULT: 'hsl(var(--tertiary))',
+					foreground: 'hsl(var(--on-tertiary))',
+					container: 'hsl(var(--tertiary-container))',
+					'container-foreground': 'hsl(var(--on-tertiary-container))',
+				},
+				error: {
+					DEFAULT: 'hsl(var(--error))',
+					foreground: 'hsl(var(--on-error))',
+					container: 'hsl(var(--error-container))',
+					'container-foreground': 'hsl(var(--on-error-container))',
+				},
+				surface: {
+					DEFAULT: 'hsl(var(--surface))',
+					foreground: 'hsl(var(--on-surface))',
+					variant: 'hsl(var(--surface-variant))',
+					'variant-foreground': 'hsl(var(--on-surface-variant))',
+					'container-lowest': 'hsl(var(--surface-container-lowest))',
+					container: 'hsl(var(--surface-container))',
+					'container-high': 'hsl(var(--surface-container-high))',
+					'container-highest': 'hsl(var(--surface-container-highest))',
+				},
+				outline: {
+					DEFAULT: 'hsl(var(--outline))',
+					variant: 'hsl(var(--outline-variant))',
+				},
+				// Legacy compatibility
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
-				primary: {
-					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
-				},
-				secondary: {
-					DEFAULT: 'hsl(var(--secondary))',
-					foreground: 'hsl(var(--secondary-foreground))'
-				},
 				destructive: {
 					DEFAULT: 'hsl(var(--destructive))',
 					foreground: 'hsl(var(--destructive-foreground))'
@@ -52,21 +85,19 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				sidebar: {
-					DEFAULT: 'hsl(var(--sidebar-background))',
-					foreground: 'hsl(var(--sidebar-foreground))',
-					primary: 'hsl(var(--sidebar-primary))',
-					'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-					accent: 'hsl(var(--sidebar-accent))',
-					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-					border: 'hsl(var(--sidebar-border))',
-					ring: 'hsl(var(--sidebar-ring))'
-				}
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)'
+				sm: 'calc(var(--radius) - 4px)',
+				xl: '12px',
+				'2xl': '16px',
+				'3xl': '20px',
+			},
+			boxShadow: {
+				'elevation-1': '0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15)',
+				'elevation-2': '0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 2px 6px 2px rgba(0, 0, 0, 0.15)',
+				'elevation-3': '0px 4px 8px 3px rgba(0, 0, 0, 0.15), 0px 1px 3px 0px rgba(0, 0, 0, 0.3)',
 			},
 			keyframes: {
 				'accordion-down': {

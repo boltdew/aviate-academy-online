@@ -10,14 +10,14 @@ const Dashboard = () => {
 
   return (
     <ErrorBoundary>
-      <div className={cn("flex h-screen w-full bg-gray-50 dark:bg-neutral-900 overflow-hidden")}>
+      <div className={cn("flex h-screen w-full bg-surface-container-lowest overflow-hidden")}>
         <AircraftSidebar 
           selectedContent={selectedContent}
           onContentSelect={setSelectedContent}
         />
         <div className="flex-1 flex flex-col min-w-0">
-          <header className="flex items-center gap-2 px-6 py-4 border-b bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-700 flex-shrink-0">
-            <h1 className="text-xl font-semibold text-slate-900 dark:text-white">
+          <header className="flex items-center gap-2 px-6 py-4 border-b bg-surface-container border-outline shadow-elevation-1 flex-shrink-0">
+            <h1 className="text-xl font-semibold text-on-surface title-large">
               Aircraft Engineering Dashboard
             </h1>
           </header>

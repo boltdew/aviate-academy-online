@@ -1,94 +1,313 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. */
+/* Material 3 Design System Implementation */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Material 3 Color Tokens - Light Theme */
+    --primary: 103 80% 43%;
+    --on-primary: 0 0% 100%;
+    --primary-container: 103 80% 85%;
+    --on-primary-container: 103 80% 10%;
+    
+    --secondary: 270 14% 45%;
+    --on-secondary: 0 0% 100%;
+    --secondary-container: 270 14% 87%;
+    --on-secondary-container: 270 14% 12%;
+    
+    --tertiary: 35 77% 49%;
+    --on-tertiary: 0 0% 100%;
+    --tertiary-container: 35 77% 91%;
+    --on-tertiary-container: 35 77% 14%;
+    
+    --error: 0 84% 60%;
+    --on-error: 0 0% 100%;
+    --error-container: 0 84% 95%;
+    --on-error-container: 0 84% 15%;
+    
+    --surface: 0 0% 99%;
+    --on-surface: 220 13% 9%;
+    --surface-variant: 220 13% 95%;
+    --on-surface-variant: 220 13% 40%;
+    --surface-container-lowest: 0 0% 100%;
+    --surface-container: 220 13% 97%;
+    --surface-container-high: 220 13% 94%;
+    --surface-container-highest: 220 13% 92%;
+    
+    --outline: 220 13% 60%;
+    --outline-variant: 220 13% 80%;
+    
+    /* Legacy compatibility */
+    --background: var(--surface);
+    --foreground: var(--on-surface);
+    --card: var(--surface-container);
+    --card-foreground: var(--on-surface);
+    --popover: var(--surface-container);
+    --popover-foreground: var(--on-surface);
+    --muted: var(--surface-variant);
+    --muted-foreground: var(--on-surface-variant);
+    --accent: var(--secondary-container);
+    --accent-foreground: var(--on-secondary-container);
+    --destructive: var(--error);
+    --destructive-foreground: var(--on-error);
+    --border: var(--outline-variant);
+    --input: var(--outline);
+    --ring: var(--primary);
+    --radius: 12px;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    /* Material 3 Color Tokens - Dark Theme */
+    --primary: 103 80% 70%;
+    --on-primary: 103 80% 15%;
+    --primary-container: 103 80% 30%;
+    --on-primary-container: 103 80% 90%;
+    
+    --secondary: 270 14% 70%;
+    --on-secondary: 270 14% 20%;
+    --secondary-container: 270 14% 30%;
+    --on-secondary-container: 270 14% 90%;
+    
+    --tertiary: 35 77% 75%;
+    --on-tertiary: 35 77% 20%;
+    --tertiary-container: 35 77% 35%;
+    --on-tertiary-container: 35 77% 95%;
+    
+    --error: 0 84% 74%;
+    --on-error: 0 84% 20%;
+    --error-container: 0 84% 30%;
+    --on-error-container: 0 84% 90%;
+    
+    --surface: 220 13% 6%;
+    --on-surface: 220 13% 95%;
+    --surface-variant: 220 13% 12%;
+    --on-surface-variant: 220 13% 70%;
+    --surface-container-lowest: 220 13% 4%;
+    --surface-container: 220 13% 8%;
+    --surface-container-high: 220 13% 12%;
+    --surface-container-highest: 220 13% 16%;
+    
+    --outline: 220 13% 50%;
+    --outline-variant: 220 13% 25%;
+    
+    /* Legacy compatibility */
+    --background: var(--surface);
+    --foreground: var(--on-surface);
+    --card: var(--surface-container);
+    --card-foreground: var(--on-surface);
+    --popover: var(--surface-container);
+    --popover-foreground: var(--on-surface);
+    --muted: var(--surface-variant);
+    --muted-foreground: var(--on-surface-variant);
+    --accent: var(--secondary-container);
+    --accent-foreground: var(--on-secondary-container);
+    --destructive: var(--error);
+    --destructive-foreground: var(--on-error);
+    --border: var(--outline-variant);
+    --input: var(--outline);
+    --ring: var(--primary);
+  }
+}
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+@layer utilities {
+  /* Material 3 Typography Scale */
+  .display-large {
+    font-size: 57px;
+    line-height: 64px;
+    font-weight: 400;
+    letter-spacing: -0.25px;
+  }
+  
+  .display-medium {
+    font-size: 45px;
+    line-height: 52px;
+    font-weight: 400;
+  }
+  
+  .display-small {
+    font-size: 36px;
+    line-height: 44px;
+    font-weight: 400;
+  }
+  
+  .headline-large {
+    font-size: 32px;
+    line-height: 40px;
+    font-weight: 400;
+  }
+  
+  .headline-medium {
+    font-size: 28px;
+    line-height: 36px;
+    font-weight: 400;
+  }
+  
+  .headline-small {
+    font-size: 24px;
+    line-height: 32px;
+    font-weight: 400;
+  }
+  
+  .title-large {
+    font-size: 22px;
+    line-height: 28px;
+    font-weight: 400;
+  }
+  
+  .title-medium {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 500;
+    letter-spacing: 0.15px;
+  }
+  
+  .title-small {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 500;
+    letter-spacing: 0.1px;
+  }
+  
+  .body-large {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+  }
+  
+  .body-medium {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 400;
+    letter-spacing: 0.25px;
+  }
+  
+  .body-small {
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 400;
+    letter-spacing: 0.4px;
+  }
+  
+  .label-large {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 500;
+    letter-spacing: 0.1px;
+  }
+  
+  .label-medium {
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+  
+  .label-small {
+    font-size: 11px;
+    line-height: 16px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+  
+  /* Material 3 Elevation */
+  .shadow-elevation-1 {
+    box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+  }
+  
+  .shadow-elevation-2 {
+    box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 2px 6px 2px rgba(0, 0, 0, 0.15);
+  }
+  
+  .shadow-elevation-3 {
+    box-shadow: 0px 4px 8px 3px rgba(0, 0, 0, 0.15), 0px 1px 3px 0px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Material 3 Surface Colors */
+  .bg-surface {
+    background-color: hsl(var(--surface));
+  }
+  
+  .bg-surface-container-lowest {
+    background-color: hsl(var(--surface-container-lowest));
+  }
+  
+  .bg-surface-container {
+    background-color: hsl(var(--surface-container));
+  }
+  
+  .bg-surface-container-high {
+    background-color: hsl(var(--surface-container-high));
+  }
+  
+  .bg-surface-container-highest {
+    background-color: hsl(var(--surface-container-highest));
+  }
+  
+  .bg-surface-variant {
+    background-color: hsl(var(--surface-variant));
+  }
+  
+  .bg-primary-container {
+    background-color: hsl(var(--primary-container));
+  }
+  
+  .bg-secondary-container {
+    background-color: hsl(var(--secondary-container));
+  }
+  
+  .bg-tertiary-container {
+    background-color: hsl(var(--tertiary-container));
+  }
+  
+  /* Text Colors */
+  .text-on-surface {
+    color: hsl(var(--on-surface));
+  }
+  
+  .text-on-surface-variant {
+    color: hsl(var(--on-surface-variant));
+  }
+  
+  .text-on-primary-container {
+    color: hsl(var(--on-primary-container));
+  }
+  
+  .text-on-secondary-container {
+    color: hsl(var(--on-secondary-container));
+  }
+  
+  .text-on-tertiary-container {
+    color: hsl(var(--on-tertiary-container));
+  }
+  
+  .text-primary {
+    color: hsl(var(--primary));
+  }
+  
+  .text-secondary {
+    color: hsl(var(--secondary));
+  }
+  
+  .text-tertiary {
+    color: hsl(var(--tertiary));
+  }
+  
+  /* Border Colors */
+  .border-outline {
+    border-color: hsl(var(--outline));
+  }
+  
+  .border-outline-variant {
+    border-color: hsl(var(--outline-variant));
+  }
+  
+  /* Background Colors for Outline Variants */
+  .bg-outline-variant {
+    background-color: hsl(var(--outline-variant));
   }
 }
 
@@ -98,6 +317,6 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-surface text-on-surface body-medium;
   }
 }

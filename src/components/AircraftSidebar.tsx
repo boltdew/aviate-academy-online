@@ -21,8 +21,8 @@ export function AircraftSidebar({ selectedContent, onContentSelect }: AircraftSi
       label: "Dashboard",
       href: "/dashboard",
       icon: (
-        <div className="w-5 h-5 rounded-md bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-          <LayoutDashboard className="text-blue-600 dark:text-blue-400 h-3 w-3" />
+        <div className="w-6 h-6 rounded-xl bg-primary-container flex items-center justify-center shadow-elevation-1">
+          <LayoutDashboard className="text-primary h-4 w-4" />
         </div>
       ),
     },
@@ -36,7 +36,7 @@ export function AircraftSidebar({ selectedContent, onContentSelect }: AircraftSi
           {open ? <Logo /> : <LogoIcon />}
           
           {/* Navigation Links */}
-          <div className="mt-6 flex flex-col gap-1">
+          <div className="mt-6 flex flex-col gap-2">
             {links.map((link, idx) => (
               <SidebarLink key={idx} link={link} />
             ))}
@@ -57,14 +57,14 @@ export function AircraftSidebar({ selectedContent, onContentSelect }: AircraftSi
 
 export const Logo = () => {
   return (
-    <div className="font-normal flex space-x-3 items-center text-sm text-black dark:text-white py-3 px-1 relative z-20">
-      <div className="h-8 w-8 bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-400 dark:to-blue-500 rounded-lg flex items-center justify-center shadow-sm">
-        <Plane className="h-4 w-4 text-white rotate-45" />
+    <div className="font-normal flex space-x-3 items-center text-sm text-on-surface py-4 px-2 relative z-20">
+      <div className="h-10 w-10 bg-primary rounded-2xl flex items-center justify-center shadow-elevation-2">
+        <Plane className="h-5 w-5 text-on-primary rotate-45" />
       </div>
       <motion.span
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="font-semibold text-neutral-900 dark:text-white whitespace-pre text-base"
+        className="font-semibold text-on-surface whitespace-pre title-large"
       >
         AeroLearn
       </motion.span>
@@ -74,9 +74,9 @@ export const Logo = () => {
 
 export const LogoIcon = () => {
   return (
-    <div className="font-normal flex space-x-2 items-center text-sm text-black dark:text-white py-3 px-1 relative z-20">
-      <div className="h-8 w-8 bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-400 dark:to-blue-500 rounded-lg flex items-center justify-center shadow-sm">
-        <Plane className="h-4 w-4 text-white rotate-45" />
+    <div className="font-normal flex space-x-2 items-center text-sm text-on-surface py-4 px-2 relative z-20">
+      <div className="h-10 w-10 bg-primary rounded-2xl flex items-center justify-center shadow-elevation-2">
+        <Plane className="h-5 w-5 text-on-primary rotate-45" />
       </div>
     </div>
   );
