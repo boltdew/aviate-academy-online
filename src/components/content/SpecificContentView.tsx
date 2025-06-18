@@ -94,59 +94,35 @@ export function SpecificContentView({ selectedContent }: SpecificContentViewProp
         {/* Content Card */}
         <Card className="bg-surface-container border-outline shadow-elevation-1 rounded-3xl overflow-hidden">
           <CardContent className="p-0">
-            <div 
-              className="prose prose-lg max-w-none p-8 prose-headings:text-on-surface prose-p:text-on-surface prose-strong:text-on-surface prose-em:text-on-surface-variant prose-code:text-primary prose-code:bg-primary-container prose-code:px-2 prose-code:py-1 prose-code:rounded-lg prose-pre:bg-surface-container-high prose-pre:border prose-pre:border-outline-variant prose-blockquote:border-l-primary prose-blockquote:bg-primary-container/20 prose-blockquote:text-on-surface prose-a:text-primary hover:prose-a:text-primary/80"
-              style={{
-                fontSize: '1.125rem',
-                lineHeight: '1.75',
-                fontFamily: 'system-ui, -apple-system, sans-serif'
-              }}
-            >
-              <style jsx>{`
-                .prose h1 {
-                  @apply text-3xl font-bold mb-6 mt-8 text-on-surface border-b border-outline-variant pb-3;
-                }
-                .prose h2 {
-                  @apply text-2xl font-semibold mb-4 mt-8 text-on-surface;
-                }
-                .prose h3 {
-                  @apply text-xl font-semibold mb-3 mt-6 text-on-surface;
-                }
-                .prose h4 {
-                  @apply text-lg font-medium mb-2 mt-4 text-on-surface;
-                }
-                .prose p {
-                  @apply mb-4 leading-relaxed text-on-surface;
-                }
-                .prose ul, .prose ol {
-                  @apply mb-4 ml-6;
-                }
-                .prose li {
-                  @apply mb-2 text-on-surface;
-                }
-                .prose blockquote {
-                  @apply border-l-4 border-primary pl-6 py-4 my-6 bg-primary-container/10 rounded-r-lg;
-                }
-                .prose code {
-                  @apply text-sm font-mono;
-                }
-                .prose pre {
-                  @apply p-4 rounded-xl overflow-x-auto;
-                }
-                .prose table {
-                  @apply w-full border-collapse border border-outline-variant rounded-lg overflow-hidden my-6;
-                }
-                .prose th {
-                  @apply bg-surface-container-high text-on-surface font-semibold p-3 border-b border-outline-variant text-left;
-                }
-                .prose td {
-                  @apply p-3 border-b border-outline-variant text-on-surface;
-                }
-                .prose img {
-                  @apply rounded-xl shadow-elevation-1 my-6;
-                }
-              `}</style>
-              <div dangerouslySetInnerHTML={{ __html: content.content }} />
+            <div className="p-8">
+              <div 
+                className="
+                  prose prose-lg max-w-none
+                  [&>h1]:text-3xl [&>h1]:font-bold [&>h1]:mb-6 [&>h1]:mt-8 [&>h1]:text-on-surface [&>h1]:border-b [&>h1]:border-outline-variant [&>h1]:pb-3
+                  [&>h2]:text-2xl [&>h2]:font-semibold [&>h2]:mb-4 [&>h2]:mt-8 [&>h2]:text-on-surface
+                  [&>h3]:text-xl [&>h3]:font-semibold [&>h3]:mb-3 [&>h3]:mt-6 [&>h3]:text-on-surface
+                  [&>h4]:text-lg [&>h4]:font-medium [&>h4]:mb-2 [&>h4]:mt-4 [&>h4]:text-on-surface
+                  [&>p]:mb-4 [&>p]:leading-relaxed [&>p]:text-on-surface [&>p]:text-base
+                  [&>ul]:mb-4 [&>ul]:ml-6 [&>ol]:mb-4 [&>ol]:ml-6
+                  [&>li]:mb-2 [&>li]:text-on-surface
+                  [&>blockquote]:border-l-4 [&>blockquote]:border-primary [&>blockquote]:pl-6 [&>blockquote]:py-4 [&>blockquote]:my-6 [&>blockquote]:bg-primary-container/10 [&>blockquote]:rounded-r-lg [&>blockquote]:text-on-surface
+                  [&>code]:text-sm [&>code]:font-mono [&>code]:text-primary [&>code]:bg-primary-container [&>code]:px-2 [&>code]:py-1 [&>code]:rounded-lg
+                  [&>pre]:p-4 [&>pre]:rounded-xl [&>pre]:overflow-x-auto [&>pre]:bg-surface-container-high [&>pre]:border [&>pre]:border-outline-variant
+                  [&>table]:w-full [&>table]:border-collapse [&>table]:border [&>table]:border-outline-variant [&>table]:rounded-lg [&>table]:overflow-hidden [&>table]:my-6
+                  [&>table>thead>tr>th]:bg-surface-container-high [&>table>thead>tr>th]:text-on-surface [&>table>thead>tr>th]:font-semibold [&>table>thead>tr>th]:p-3 [&>table>thead>tr>th]:border-b [&>table>thead>tr>th]:border-outline-variant [&>table>thead>tr>th]:text-left
+                  [&>table>tbody>tr>td]:p-3 [&>table>tbody>tr>td]:border-b [&>table>tbody>tr>td]:border-outline-variant [&>table>tbody>tr>td]:text-on-surface
+                  [&>img]:rounded-xl [&>img]:shadow-elevation-1 [&>img]:my-6
+                  [&>strong]:text-on-surface [&>strong]:font-semibold
+                  [&>em]:text-on-surface-variant [&>em]:italic
+                  [&>a]:text-primary [&>a]:no-underline hover:[&>a]:text-primary/80 hover:[&>a]:underline
+                "
+                style={{
+                  fontSize: '1.125rem',
+                  lineHeight: '1.75',
+                  fontFamily: 'system-ui, -apple-system, sans-serif'
+                }}
+                dangerouslySetInnerHTML={{ __html: content.content }}
+              />
             </div>
           </CardContent>
         </Card>
