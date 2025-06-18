@@ -3,16 +3,17 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { LoadingScreen } from "@/components/ui/loading";
 import { Suspense, useState, useEffect } from "react";
 import { SpecificContentView } from "./content/SpecificContentView";
-import { DashboardOverview } from "./content/DashboardOverview";
+import { ContentHub } from "./content/ContentHub";
 import { UserProfile } from "./user/UserProfile";
 import { UserSettings } from "./user/UserSettings";
 import { UserStats } from "./user/UserStats";
 
 interface ContentAreaProps {
   selectedContent: { chapter: string; section: string; file: string } | null;
+  searchQuery?: string;
 }
 
-export function ContentArea({ selectedContent }: ContentAreaProps) {
+export function ContentArea({ selectedContent, searchQuery }: ContentAreaProps) {
   const [selectedFunction, setSelectedFunction] = useState<string | null>(null);
 
   useEffect(() => {
@@ -27,7 +28,7 @@ export function ContentArea({ selectedContent }: ContentAreaProps) {
     };
   }, []);
 
-  console.log("🔄 ContentArea rendering with:", { selectedContent, selectedFunction });
+  console.log("🔄 ContentArea rendering with:", { selectedContent, selectedFunction, searchQuery });
 
   const renderContent = () => {
     if (selectedFunction) {
@@ -39,7 +40,7 @@ export function ContentArea({ selectedContent }: ContentAreaProps) {
         case 'stats':
           return <UserStats />;
         default:
-          return <DashboardOverview />;
+          return <ContentHub searchQuery={searchQuery} />;
       }
     }
 
@@ -47,7 +48,7 @@ export function ContentArea({ selectedContent }: ContentAreaProps) {
       return <SpecificContentView selectedContent={selectedContent} />;
     }
 
-    return <DashboardOverview />;
+    return <ContentHub searchQuery={searchQuery} />;
   };
 
   return (

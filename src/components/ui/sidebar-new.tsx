@@ -98,7 +98,6 @@ export const DesktopSidebar = ({
         }}
         onMouseEnter={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
-        {...props}
       >
         {children}
       </motion.div>
@@ -155,7 +154,6 @@ export const MobileSidebar = ({
                 "fixed h-full w-full inset-0 bg-surface-container p-10 z-[100] flex flex-col justify-between",
                 className
               )}
-              {...props}
             >
               <div
                 className="absolute right-10 top-10 z-50 text-on-surface"
