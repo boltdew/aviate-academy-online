@@ -1,41 +1,12 @@
 
 "use client";
 
-import { cn } from "@/lib/utils";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { motion } from "framer-motion";
 import { useState } from "react";
-import { Separator } from "@/components/ui/separator";
-import { SidebarHeader } from "./sidebar/SidebarHeader";
-import { SidebarNavigation } from "./sidebar/SidebarNavigation";
-import { ContentTree } from "./sidebar/ContentTree";
-import { SidebarFooter } from "./sidebar/SidebarFooter";
-
-const sidebarVariants = {
-  open: {
-    width: "22rem",
-  },
-  closed: {
-    width: "3.05rem",
-  },
-};
-
-const contentVariants = {
-  open: { display: "block", opacity: 1 },
-  closed: { display: "block", opacity: 1 },
-};
-
-const staggerVariants = {
-  open: {
-    transition: { staggerChildren: 0.03, delayChildren: 0.02 },
-  },
-};
-
-const transitionProps = {
-  type: "tween" as const,
-  ease: "easeOut" as const,
-  duration: 0.2,
-};
+import { SidebarNew, SidebarBody, SidebarLink } from "@/components/ui/sidebar-new";
+import { LayoutDashboard, Plane } from "lucide-react";
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
+import { HierarchicalContentTree } from "./sidebar/HierarchicalContentTree";
 
 interface AircraftSidebarProps {
   selectedContent: { chapter: string; section: string; file: string } | null;
@@ -43,56 +14,68 @@ interface AircraftSidebarProps {
 }
 
 export function AircraftSidebar({ selectedContent, onContentSelect }: AircraftSidebarProps) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  const links = [
+    {
+      label: "Dashboard",
+      href: "/dashboard",
+      icon: (
+        <LayoutDashboard className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+      ),
+    },
+  ];
 
   return (
-    <motion.div
-      className={cn(
-        "sidebar fixed left-0 z-40 h-full shrink-0 border-r bg-white",
-      )}
-      initial={isCollapsed ? "closed" : "open"}
-      animate={isCollapsed ? "closed" : "open"}
-      variants={sidebarVariants}
-      transition={transitionProps}
-      onMouseEnter={() => setIsCollapsed(false)}
-      onMouseLeave={() => setIsCollapsed(true)}
-    >
-      <motion.div
-        className={`relative z-40 flex text-muted-foreground h-full shrink-0 flex-col bg-white dark:bg-black transition-all`}
-        variants={contentVariants}
-      >
-        <motion.ul variants={staggerVariants} className="flex h-full flex-col">
-          <div className="flex grow flex-col items-center">
-            {/* Header */}
-            <SidebarHeader isCollapsed={isCollapsed} />
-
-            <div className="flex h-full w-full flex-col">
-              <div className="flex grow flex-col gap-2">
-                <ScrollArea className="h-16 grow p-3">
-                  <div className={cn("flex w-full flex-col gap-1")}>
-                    {/* Navigation Items */}
-                    <SidebarNavigation isCollapsed={isCollapsed} />
-
-                    <Separator className="w-full my-3" />
-                    
-                    {/* Content Tree */}
-                    <ContentTree 
-                      isCollapsed={isCollapsed}
-                      selectedContent={selectedContent}
-                      onContentSelect={onContentSelect}
-                    />
-                  </div>
-                </ScrollArea>
-              </div>
-              
-              {/* Footer */}
-              <div className="flex flex-col p-2 border-t">
-                <SidebarFooter isCollapsed={isCollapsed} />
-              </div>
+    <div className={cn("flex flex-col md:flex-row bg-white dark:bg-neutral-900 w-full flex-1 border-r border-neutral-200 dark:border-neutral-700 overflow-hidden")}>
+      <SidebarNew open={open} setOpen={setOpen}>
+        <SidebarBody className="justify-between gap-4">
+          <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
+            {/* Logo */}
+            {open ? <Logo /> : <LogoIcon />}
+            
+            {/* Navigation Links */}
+            <div className="mt-4 flex flex-col gap-1">
+              {links.map((link, idx) => (
+                <SidebarLink key={idx} link={link} />
+              ))}
             </div>
+
+            {/* Hierarchical Content Tree */}
+            <HierarchicalContentTree 
+              selectedContent={selectedContent}
+              onContentSelect={onContentSelect}
+            />
           </div>
-        </motion.ul>
-      </motion.div>
-    </motion.div>
+        </SidebarBody>
+      </SidebarNew>
+    </div>
   );
 }
+
+export const Logo = () => {
+  return (
+    <div className="font-normal flex space-x-2 items-center text-sm text-black dark:text-white py-1 relative z-20">
+      <div className="h-5 w-6 bg-blue-600 dark:bg-blue-400 rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0">
+        <Plane className="h-3 w-3 text-white m-1" />
+      </div>
+      <motion.span
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="font-medium text-black dark:text-white whitespace-pre"
+      >
+        AeroLearn Docs
+      </motion.span>
+    </div>
+  );
+};
+
+export const LogoIcon = () => {
+  return (
+    <div className="font-normal flex space-x-2 items-center text-sm text-black dark:text-white py-1 relative z-20">
+      <div className="h-5 w-6 bg-blue-600 dark:bg-blue-400 rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0">
+        <Plane className="h-3 w-3 text-white m-1" />
+      </div>
+    </div>
+  );
+};
