@@ -3,8 +3,8 @@ import { AircraftSidebar } from "@/components/AircraftSidebar";
 import { ContentArea } from "@/components/ContentArea";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { MaterialSidebarProvider } from "@/components/ui/material-sidebar";
 import { useState, useEffect } from "react";
-import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const Dashboard = () => {
@@ -70,48 +70,31 @@ const Dashboard = () => {
 
   return (
     <ErrorBoundary>
-      <div className="flex flex-col h-screen w-full bg-surface-container-lowest overflow-hidden">
-        <AppHeader 
-          onSearch={handleSearch}
-          onUserFunctionSelect={handleUserFunctionSelect}
-          onMenuToggle={handleMenuToggle}
-        />
-        <div className="flex flex-1 min-h-0 relative">
-          {/* Mobile Sidebar Overlay */}
-          {isMobile && sidebarOpen && (
-            <div 
-              className="fixed inset-0 bg-black/50 z-40"
-              onClick={() => setSidebarOpen(false)}
-            />
-          )}
-          
-          {/* Sidebar */}
-          <div className={cn(
-            "border-r border-outline bg-surface-container transition-all duration-300 ease-in-out z-50",
-            isMobile ? (
-              sidebarOpen 
-                ? "fixed left-0 top-16 bottom-0 w-72 sm:w-80 shadow-elevation-4" 
-                : "hidden"
-            ) : "w-72 lg:w-80 xl:w-96 flex-shrink-0 relative"
-          )}>
+      <MaterialSidebarProvider isOpen={sidebarOpen} onOpenChange={setSidebarOpen}>
+        <div className="flex flex-col h-screen w-full bg-surface-container-lowest overflow-hidden">
+          <AppHeader 
+            onSearch={handleSearch}
+            onUserFunctionSelect={handleUserFunctionSelect}
+            onMenuToggle={handleMenuToggle}
+          />
+          <div className="flex flex-1 min-h-0 relative">
             <AircraftSidebar 
               selectedContent={selectedContent}
               selectedSection={selectedSection}
               onContentSelect={handleContentSelect}
               onSectionSelect={handleSectionSelect}
             />
+            
+            <main className="flex-1 overflow-hidden bg-surface-container-lowest">
+              <ContentArea 
+                selectedContent={selectedContent}
+                selectedSection={selectedSection}
+                searchQuery={searchQuery}
+              />
+            </main>
           </div>
-          
-          {/* Main Content */}
-          <main className="flex-1 overflow-hidden bg-surface-container-lowest">
-            <ContentArea 
-              selectedContent={selectedContent}
-              selectedSection={selectedSection}
-              searchQuery={searchQuery}
-            />
-          </main>
         </div>
-      </div>
+      </MaterialSidebarProvider>
     </ErrorBoundary>
   );
 };
