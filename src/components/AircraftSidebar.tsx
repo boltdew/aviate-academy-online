@@ -12,7 +12,7 @@ import {
   MaterialSidebarItem,
   useMaterialSidebar
 } from "@/components/ui/material-sidebar";
-import { LayoutDashboard, Plane, User, Settings, BarChart3, Award, BookOpen } from "lucide-react";
+import { Plane, Award, BookOpen } from "lucide-react";
 import { HierarchicalContentTree } from "./sidebar/HierarchicalContentTree";
 
 interface AircraftSidebarProps {
@@ -33,159 +33,13 @@ const SidebarLogo = () => {
       {isOpen && (
         <div className="flex flex-col min-w-0">
           <span className="font-bold text-on-surface whitespace-nowrap title-medium">
-            AeroLearn Pro
+            Aircraft Systems
           </span>
           <span className="text-xs text-on-surface-variant body-small opacity-80">
-            Advanced Engineering Platform
+            Learning Content
           </span>
         </div>
       )}
-    </div>
-  );
-};
-
-const NavigationSection = ({ 
-  selectedContent, 
-  selectedSection, 
-  selectedFunction,
-  onContentSelect, 
-  onSectionSelect,
-  onFunctionSelect 
-}: {
-  selectedContent: { chapter: string; section: string; file: string } | null;
-  selectedSection?: { chapter: string; section: string } | null;
-  selectedFunction: string | null;
-  onContentSelect: (content: { chapter: string; section: string; file: string } | null) => void;
-  onSectionSelect?: (section: { chapter: string; section: string } | null) => void;
-  onFunctionSelect: (func: string) => void;
-}) => {
-  const { isOpen } = useMaterialSidebar();
-
-  const mainLinks = [
-    {
-      label: "Dashboard Overview",
-      icon: (
-        <div className="w-7 h-7 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-elevation-2">
-          <LayoutDashboard className="text-on-primary h-4 w-4" />
-        </div>
-      ),
-      onClick: () => {
-        onFunctionSelect('');
-        onContentSelect(null);
-        if (onSectionSelect) onSectionSelect(null);
-      },
-      isActive: selectedFunction === '' && !selectedContent && !selectedSection
-    },
-  ];
-
-  const userFunctions = [
-    {
-      label: "Profile & Achievements",
-      function: "profile",
-      icon: (
-        <div className="w-7 h-7 rounded-2xl bg-gradient-to-br from-secondary to-secondary/80 flex items-center justify-center shadow-elevation-2">
-          <User className="text-on-secondary h-4 w-4" />
-        </div>
-      ),
-    },
-    {
-      label: "Learning Analytics",
-      function: "stats",
-      icon: (
-        <div className="w-7 h-7 rounded-2xl bg-gradient-to-br from-tertiary to-tertiary/80 flex items-center justify-center shadow-elevation-2">
-          <BarChart3 className="text-on-tertiary h-4 w-4" />
-        </div>
-      ),
-    },
-    {
-      label: "Premium Settings",
-      function: "settings",
-      icon: (
-        <div className="w-7 h-7 rounded-2xl bg-gradient-to-br from-surface-variant to-surface-container-high flex items-center justify-center shadow-elevation-2">
-          <Settings className="text-on-surface-variant h-4 w-4" />
-        </div>
-      ),
-    },
-  ];
-
-  return (
-    <div className="space-y-8">
-      {/* Main Navigation */}
-      <div>
-        {isOpen && (
-          <div className="px-2 mb-4">
-            <h3 className="text-xs font-bold text-on-surface-variant uppercase tracking-wider label-small opacity-80">
-              Main Navigation
-            </h3>
-          </div>
-        )}
-        <div className="space-y-2">
-          {mainLinks.map((link, idx) => (
-            <MaterialSidebarItem 
-              key={idx}
-              onClick={link.onClick}
-              isActive={link.isActive}
-            >
-              {link.icon}
-              {isOpen && (
-                <span className="text-on-surface text-sm font-medium body-medium">
-                  {link.label}
-                </span>
-              )}
-            </MaterialSidebarItem>
-          ))}
-        </div>
-      </div>
-
-      {/* User Functions */}
-      <div>
-        {isOpen && (
-          <div className="px-2 mb-4">
-            <h3 className="text-xs font-bold text-on-surface-variant uppercase tracking-wider label-small opacity-80">
-              Personal Space
-            </h3>
-          </div>
-        )}
-        <div className="space-y-2">
-          {userFunctions.map((func, idx) => (
-            <MaterialSidebarItem
-              key={idx}
-              onClick={() => onFunctionSelect(func.function)}
-              isActive={selectedFunction === func.function}
-            >
-              {func.icon}
-              {isOpen && (
-                <span className="text-on-surface text-sm font-medium body-medium">
-                  {func.label}
-                </span>
-              )}
-            </MaterialSidebarItem>
-          ))}
-        </div>
-      </div>
-
-      {/* Content Tree */}
-      <div>
-        {isOpen && (
-          <div className="px-2 mb-4">
-            <h3 className="text-xs font-bold text-on-surface-variant uppercase tracking-wider label-small opacity-80">
-              Learning Content
-            </h3>
-          </div>
-        )}
-        <HierarchicalContentTree 
-          selectedContent={selectedContent}
-          selectedSection={selectedSection}
-          onContentSelect={(content) => {
-            onFunctionSelect('');
-            onContentSelect(content);
-          }}
-          onSectionSelect={(section) => {
-            onFunctionSelect('');
-            if (onSectionSelect) onSectionSelect(section);
-          }}
-        />
-      </div>
     </div>
   );
 };
@@ -214,18 +68,6 @@ const SidebarContentWrapper = ({
   onContentSelect, 
   onSectionSelect 
 }: AircraftSidebarProps) => {
-  const [selectedFunction, setSelectedFunction] = useState<string | null>(null);
-
-  const handleFunctionSelect = (functionName: string) => {
-    setSelectedFunction(functionName);
-    onContentSelect(null);
-    if (onSectionSelect) onSectionSelect(null);
-    
-    if (functionName) {
-      window.dispatchEvent(new CustomEvent('userFunctionSelected', { detail: functionName }));
-    }
-  };
-
   return (
     <MaterialSidebarContent>
       <MaterialSidebarHeader>
@@ -233,13 +75,11 @@ const SidebarContentWrapper = ({
       </MaterialSidebarHeader>
       
       <MaterialSidebarBody>
-        <NavigationSection
+        <HierarchicalContentTree 
           selectedContent={selectedContent}
           selectedSection={selectedSection}
-          selectedFunction={selectedFunction}
           onContentSelect={onContentSelect}
           onSectionSelect={onSectionSelect}
-          onFunctionSelect={handleFunctionSelect}
         />
       </MaterialSidebarBody>
       

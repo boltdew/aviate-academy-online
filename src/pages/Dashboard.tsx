@@ -44,7 +44,11 @@ const Dashboard = () => {
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    console.log("Searching for:", query);
+    console.log("Dashboard received search query:", query);
+    // Clear selections when searching
+    setSelectedContent(null);
+    setSelectedSection(null);
+    setSelectedFunction(null);
   };
 
   const handleUserFunctionSelect = (func: string) => {

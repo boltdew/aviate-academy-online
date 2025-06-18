@@ -1,7 +1,6 @@
-
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   ChevronRight,
   ChevronDown,
@@ -33,6 +32,21 @@ export function HierarchicalContentTree({
 
   const contentStructure = ContentService.getContentStructure();
 
+  // Auto-collapse logic: only keep currently selected chapter/section expanded
+  useEffect(() => {
+    if (selectedContent) {
+      // Keep only the selected chapter expanded
+      setExpandedChapters(new Set([selectedContent.chapter]));
+      // Keep only the selected section expanded
+      setExpandedSections(new Set([`${selectedContent.chapter}-${selectedContent.section}`]));
+    } else if (selectedSection) {
+      // Keep only the selected chapter expanded
+      setExpandedChapters(new Set([selectedSection.chapter]));
+      // Keep only the selected section expanded  
+      setExpandedSections(new Set([`${selectedSection.chapter}-${selectedSection.section}`]));
+    }
+  }, [selectedContent, selectedSection]);
+
   const toggleChapter = (chapterCode: string) => {
     const newExpanded = new Set(expandedChapters);
     if (newExpanded.has(chapterCode)) {
@@ -47,7 +61,11 @@ export function HierarchicalContentTree({
         setExpandedSections(newSections);
       });
     } else {
+      // Auto-collapse: close all other chapters and open this one
+      newExpanded.clear();
       newExpanded.add(chapterCode);
+      // Clear all expanded sections when switching chapters
+      setExpandedSections(new Set());
     }
     setExpandedChapters(newExpanded);
   };
@@ -58,6 +76,8 @@ export function HierarchicalContentTree({
     if (newExpanded.has(sectionId)) {
       newExpanded.delete(sectionId);
     } else {
+      // Auto-collapse: close all other sections and open this one
+      newExpanded.clear();
       newExpanded.add(sectionId);
     }
     setExpandedSections(newExpanded);
@@ -103,19 +123,6 @@ export function HierarchicalContentTree({
 
   return (
     <div className="space-y-2">
-      {/* Header */}
-      <div className="px-3 py-3">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-6 h-6 rounded-xl bg-tertiary-container flex items-center justify-center shadow-elevation-1">
-            <BookOpen className="h-4 w-4 text-tertiary" />
-          </div>
-          <p className="text-sm font-semibold text-on-surface label-large">
-            Aircraft Systems
-          </p>
-        </div>
-        <div className="h-px bg-outline-variant"></div>
-      </div>
-
       {/* Content Tree */}
       <div className="space-y-1">
         {Object.entries(contentStructure).map(([chapterCode, chapterData]) => {

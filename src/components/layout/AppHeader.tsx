@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { useUser } from "@clerk/clerk-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useNavigate } from "react-router-dom";
 
 interface AppHeaderProps {
   onMenuToggle?: () => void;
@@ -29,10 +30,21 @@ export function AppHeader({ onMenuToggle, onSearch, onUserFunctionSelect }: AppH
   const [isDarkMode, setIsDarkMode] = useState(false);
   const { user } = useUser();
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    onSearch?.(searchQuery);
+    if (searchQuery.trim()) {
+      onSearch?.(searchQuery.trim());
+      console.log("Searching for:", searchQuery.trim());
+    }
+  };
+
+  const handleMobileSearch = () => {
+    if (searchQuery.trim()) {
+      onSearch?.(searchQuery.trim());
+      console.log("Mobile search for:", searchQuery.trim());
+    }
   };
 
   const toggleDarkMode = () => {
@@ -42,6 +54,10 @@ export function AppHeader({ onMenuToggle, onSearch, onUserFunctionSelect }: AppH
 
   const handleUserFunction = (func: string) => {
     onUserFunctionSelect?.(func);
+  };
+
+  const handleLogoClick = () => {
+    navigate('/');
   };
 
   return (
@@ -60,7 +76,7 @@ export function AppHeader({ onMenuToggle, onSearch, onUserFunctionSelect }: AppH
           </Button>
         )}
         
-        <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+        <div className="flex items-center gap-2 sm:gap-4 min-w-0 cursor-pointer" onClick={handleLogoClick}>
           <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary rounded-2xl flex items-center justify-center shadow-elevation-2 flex-shrink-0">
             <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-on-primary" />
           </div>
@@ -102,15 +118,26 @@ export function AppHeader({ onMenuToggle, onSearch, onUserFunctionSelect }: AppH
 
       {/* Right Section - Actions */}
       <div className="flex items-center gap-1 sm:gap-2 lg:gap-4 flex-shrink-0">
-        {/* Mobile Search Button */}
+        {/* Mobile Search */}
         {isMobile && (
-          <Button
-            variant="ghost" 
-            size="icon"
-            className="w-10 h-10 rounded-2xl hover:bg-primary-container"
-          >
-            <Search className="h-5 w-5 text-on-surface" />
-          </Button>
+          <div className="flex items-center gap-2">
+            <Input
+              type="text"
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-32 h-8 text-sm rounded-xl"
+              onKeyPress={(e) => e.key === 'Enter' && handleMobileSearch()}
+            />
+            <Button
+              variant="ghost" 
+              size="icon"
+              onClick={handleMobileSearch}
+              className="w-8 h-8 rounded-xl hover:bg-primary-container"
+            >
+              <Search className="h-4 w-4 text-on-surface" />
+            </Button>
+          </div>
         )}
 
         {/* Dark Mode Toggle - Hidden on mobile */}
