@@ -10,6 +10,7 @@ import {
   FolderOpen,
   FileText,
   BookOpen,
+  Grid3X3,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ContentService } from "@/services/contentService";
@@ -17,10 +18,17 @@ import { useSidebarNew } from "@/components/ui/sidebar-new";
 
 interface HierarchicalContentTreeProps {
   selectedContent: { chapter: string; section: string; file: string } | null;
+  selectedSection?: { chapter: string; section: string } | null;
   onContentSelect: (content: { chapter: string; section: string; file: string } | null) => void;
+  onSectionSelect?: (section: { chapter: string; section: string } | null) => void;
 }
 
-export function HierarchicalContentTree({ selectedContent, onContentSelect }: HierarchicalContentTreeProps) {
+export function HierarchicalContentTree({ 
+  selectedContent, 
+  selectedSection,
+  onContentSelect, 
+  onSectionSelect 
+}: HierarchicalContentTreeProps) {
   const [expandedChapters, setExpandedChapters] = useState<Set<string>>(new Set());
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
   const { open } = useSidebarNew();
@@ -56,6 +64,23 @@ export function HierarchicalContentTree({ selectedContent, onContentSelect }: Hi
       newExpanded.add(sectionId);
     }
     setExpandedSections(newExpanded);
+  };
+
+  const handleSectionClick = (chapter: string, section: string) => {
+    if (onSectionSelect) {
+      const sectionKey = { chapter, section };
+      
+      // If already selected, deselect
+      if (selectedSection && 
+          selectedSection.chapter === chapter && 
+          selectedSection.section === section) {
+        onSectionSelect(null);
+      } else {
+        onSectionSelect(sectionKey);
+        // Dispatch custom event
+        window.dispatchEvent(new CustomEvent('sectionSelected', { detail: sectionKey }));
+      }
+    }
   };
 
   const handleContentSelect = (chapter: string, section: string, file: string) => {
@@ -139,31 +164,62 @@ export function HierarchicalContentTree({ selectedContent, onContentSelect }: Hi
                   {Object.entries(chapterData.sections).map(([sectionKey, sectionData]) => {
                     const sectionId = `${chapterCode}-${sectionKey}`;
                     const isSectionExpanded = expandedSections.has(sectionId);
+                    const isSectionSelected = selectedSection && 
+                      selectedSection.chapter === chapterCode && 
+                      selectedSection.section === sectionKey;
                     
                     return (
                       <div key={sectionKey} className="space-y-1">
-                        {/* Section Header */}
+                        {/* Section Header - Now clickable for card grid */}
                         <div
                           className={cn(
-                            "flex items-center px-3 py-2.5 text-sm transition-all duration-200 hover:bg-secondary-container cursor-pointer rounded-lg",
+                            "flex items-center px-3 py-2.5 text-sm transition-all duration-200 cursor-pointer rounded-lg group",
+                            isSectionSelected 
+                              ? "bg-primary-container text-on-primary-container shadow-elevation-2" 
+                              : "hover:bg-secondary-container"
                           )}
-                          onClick={() => toggleSection(chapterCode, sectionKey)}
+                          onClick={() => handleSectionClick(chapterCode, sectionKey)}
                         >
                           <div className="flex items-center gap-2 flex-1 min-w-0">
-                            <div className="w-4 h-4 rounded-lg bg-tertiary-container flex items-center justify-center flex-shrink-0 shadow-elevation-1">
-                              {isSectionExpanded ? (
-                                <FolderOpen className="h-2.5 w-2.5 text-tertiary" />
-                              ) : (
-                                <Folder className="h-2.5 w-2.5 text-tertiary" />
-                              )}
+                            <div className={cn(
+                              "w-4 h-4 rounded-lg flex items-center justify-center flex-shrink-0 shadow-elevation-1",
+                              isSectionSelected 
+                                ? "bg-primary text-on-primary" 
+                                : "bg-tertiary-container"
+                            )}>
+                              <Grid3X3 className="h-2.5 w-2.5 text-current" />
                             </div>
-                            <span className="text-on-surface-variant text-sm capitalize truncate body-medium">
-                              {sectionKey}
+                            <span className="text-xs font-mono bg-surface-variant text-on-surface-variant px-2 py-1 rounded-lg min-w-[3rem] text-center flex-shrink-0 label-small">
+                              {chapterCode}-{sectionKey}
                             </span>
+                            <span className={cn(
+                              "text-sm capitalize truncate body-medium font-medium",
+                              isSectionSelected ? "text-on-primary-container" : "text-on-surface-variant"
+                            )}>
+                              Section {sectionKey}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <span className="text-xs text-on-surface-variant bg-surface-variant px-2 py-1 rounded-lg">
+                              {sectionData.files.length}
+                            </span>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleSection(chapterCode, sectionKey);
+                              }}
+                              className="p-1 hover:bg-surface-variant rounded-lg transition-colors"
+                            >
+                              {isSectionExpanded ? (
+                                <ChevronDown className="h-3 w-3 text-on-surface-variant" />
+                              ) : (
+                                <ChevronRight className="h-3 w-3 text-on-surface-variant" />
+                              )}
+                            </button>
                           </div>
                         </div>
                         
-                        {/* Files Level */}
+                        {/* Files Level - Traditional list view */}
                         {isSectionExpanded && (
                           <div className="ml-6 space-y-1 border-l border-outline-variant pl-4">
                             {sectionData.files.map((file) => (

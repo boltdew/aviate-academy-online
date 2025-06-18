@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -10,10 +9,17 @@ import { HierarchicalContentTree } from "./sidebar/HierarchicalContentTree";
 
 interface AircraftSidebarProps {
   selectedContent: { chapter: string; section: string; file: string } | null;
+  selectedSection?: { chapter: string; section: string } | null;
   onContentSelect: (content: { chapter: string; section: string; file: string } | null) => void;
+  onSectionSelect?: (section: { chapter: string; section: string } | null) => void;
 }
 
-export function AircraftSidebar({ selectedContent, onContentSelect }: AircraftSidebarProps) {
+export function AircraftSidebar({ 
+  selectedContent, 
+  selectedSection, 
+  onContentSelect, 
+  onSectionSelect 
+}: AircraftSidebarProps) {
   const [open, setOpen] = useState(true);
   const [selectedFunction, setSelectedFunction] = useState<string | null>(null);
 
@@ -29,6 +35,7 @@ export function AircraftSidebar({ selectedContent, onContentSelect }: AircraftSi
       onClick: () => {
         setSelectedFunction(null);
         onContentSelect(null);
+        if (onSectionSelect) onSectionSelect(null);
       }
     },
   ];
@@ -66,6 +73,7 @@ export function AircraftSidebar({ selectedContent, onContentSelect }: AircraftSi
   const handleFunctionSelect = (functionName: string) => {
     setSelectedFunction(functionName);
     onContentSelect(null); // Clear content selection when switching to user functions
+    if (onSectionSelect) onSectionSelect(null); // Clear section selection
   };
 
   return (
@@ -89,7 +97,8 @@ export function AircraftSidebar({ selectedContent, onContentSelect }: AircraftSi
                 onClick={link.onClick}
                 className={cn(
                   "shadow-elevation-1 hover:shadow-elevation-3 transition-all duration-300",
-                  selectedFunction === null && selectedContent === null ? "bg-primary-container shadow-elevation-2" : ""
+                  selectedFunction === null && selectedContent === null && selectedSection === null 
+                    ? "bg-primary-container shadow-elevation-2" : ""
                 )}
               />
             ))}
@@ -136,9 +145,14 @@ export function AircraftSidebar({ selectedContent, onContentSelect }: AircraftSi
             </div>
             <HierarchicalContentTree 
               selectedContent={selectedContent}
+              selectedSection={selectedSection}
               onContentSelect={(content) => {
                 setSelectedFunction(null);
                 onContentSelect(content);
+              }}
+              onSectionSelect={(section) => {
+                setSelectedFunction(null);
+                if (onSectionSelect) onSectionSelect(section);
               }}
             />
           </div>
