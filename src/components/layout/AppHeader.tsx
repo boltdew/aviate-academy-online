@@ -43,44 +43,45 @@ export function AppHeader({ onMenuToggle, onSearch, onUserFunctionSelect }: AppH
   };
 
   return (
-    <header className="flex items-center justify-between gap-4 px-6 py-4 border-b bg-surface-container border-outline shadow-elevation-1 flex-shrink-0">
+    <header className="flex items-center justify-between gap-2 sm:gap-4 px-3 sm:px-6 py-3 sm:py-4 border-b bg-surface-container border-outline shadow-elevation-1 flex-shrink-0 h-16">
       {/* Left Section - Menu and Title */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 sm:gap-4 min-w-0">
         <Button
           variant="ghost"
           size="icon"
           onClick={onMenuToggle}
-          className="md:hidden"
+          className="md:hidden flex-shrink-0"
         >
           <Menu className="h-5 w-5" />
         </Button>
-        <h1 className="text-xl font-semibold text-on-surface title-large">
-          Aircraft Engineering Dashboard
+        <h1 className="text-sm sm:text-xl font-semibold text-on-surface title-large truncate">
+          <span className="hidden sm:inline">Aircraft Engineering Dashboard</span>
+          <span className="sm:hidden">AeroLearn</span>
         </h1>
       </div>
 
       {/* Center Section - Search Bar */}
-      <div className="flex-1 max-w-md mx-4">
+      <div className="flex-1 max-w-xs sm:max-w-md mx-2 sm:mx-4">
         <form onSubmit={handleSearch} className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-on-surface-variant" />
+          <Search className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 h-3 w-3 sm:h-4 sm:w-4 text-on-surface-variant" />
           <Input
             type="text"
-            placeholder="Search content, chapters, or topics..."
+            placeholder="Search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 bg-surface-container-high border-outline-variant rounded-2xl focus:border-primary"
+            className="pl-8 sm:pl-10 pr-2 text-sm bg-surface-container-high border-outline-variant rounded-2xl focus:border-primary h-8 sm:h-10"
           />
         </form>
       </div>
 
       {/* Right Section - Actions and User Menu */}
-      <div className="flex items-center gap-3">
-        {/* Dark Mode Toggle */}
+      <div className="flex items-center gap-1 sm:gap-3">
+        {/* Dark Mode Toggle - Hidden on mobile */}
         <Button
           variant="ghost"
           size="icon"
           onClick={toggleDarkMode}
-          className="rounded-2xl hover:bg-primary-container"
+          className="hidden sm:flex rounded-2xl hover:bg-primary-container"
         >
           {isDarkMode ? (
             <Sun className="h-5 w-5 text-on-surface" />
@@ -89,8 +90,8 @@ export function AppHeader({ onMenuToggle, onSearch, onUserFunctionSelect }: AppH
           )}
         </Button>
 
-        {/* Notifications */}
-        <div className="relative">
+        {/* Notifications - Hidden on mobile */}
+        <div className="relative hidden sm:block">
           <Button
             variant="ghost"
             size="icon"
@@ -98,7 +99,7 @@ export function AppHeader({ onMenuToggle, onSearch, onUserFunctionSelect }: AppH
           >
             <Bell className="h-5 w-5 text-on-surface" />
             <Badge 
-              className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-error text-on-error p-0 flex items-center justify-center text-xs"
+              className="absolute -top-1 -right-1 h-4 w-4 sm:h-5 sm:w-5 rounded-full bg-error text-on-error p-0 flex items-center justify-center text-xs"
             >
               3
             </Badge>
@@ -110,12 +111,12 @@ export function AppHeader({ onMenuToggle, onSearch, onUserFunctionSelect }: AppH
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
-              className="flex items-center gap-3 px-3 py-2 rounded-2xl hover:bg-primary-container"
+              className="flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-2 rounded-2xl hover:bg-primary-container"
             >
-              <div className="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center">
-                <User className="h-4 w-4 text-primary" />
+              <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-primary-container flex items-center justify-center">
+                <User className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
               </div>
-              <div className="hidden md:block text-left">
+              <div className="hidden lg:block text-left">
                 <p className="text-sm font-medium text-on-surface">
                   {user?.fullName || "User"}
                 </p>
@@ -127,7 +128,7 @@ export function AppHeader({ onMenuToggle, onSearch, onUserFunctionSelect }: AppH
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="end"
-            className="w-56 bg-surface-container border-outline shadow-elevation-2 rounded-2xl"
+            className="w-48 sm:w-56 bg-surface-container border-outline shadow-elevation-2 rounded-2xl"
           >
             <DropdownMenuLabel className="text-on-surface">
               My Account
@@ -154,6 +155,17 @@ export function AppHeader({ onMenuToggle, onSearch, onUserFunctionSelect }: AppH
               <Settings className="mr-2 h-4 w-4" />
               Settings
             </DropdownMenuItem>
+            {/* Mobile-only options */}
+            <div className="sm:hidden">
+              <DropdownMenuSeparator className="bg-outline-variant" />
+              <DropdownMenuItem 
+                onClick={toggleDarkMode}
+                className="hover:bg-primary-container hover:text-on-primary-container rounded-xl mx-1"
+              >
+                {isDarkMode ? <Sun className="mr-2 h-4 w-4" /> : <Moon className="mr-2 h-4 w-4" />}
+                {isDarkMode ? 'Light Mode' : 'Dark Mode'}
+              </DropdownMenuItem>
+            </div>
             <DropdownMenuSeparator className="bg-outline-variant" />
             <DropdownMenuItem className="hover:bg-error-container hover:text-on-error-container rounded-xl mx-1">
               Sign out

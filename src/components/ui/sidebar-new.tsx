@@ -90,11 +90,11 @@ export const DesktopSidebar = ({
     <>
       <motion.div
         className={cn(
-          "h-full px-4 py-4 hidden md:flex md:flex-col bg-surface-container border-r border-outline w-[300px] flex-shrink-0 shadow-elevation-1",
+          "h-full px-2 sm:px-4 py-3 sm:py-4 hidden md:flex md:flex-col bg-surface-container border-r border-outline w-[240px] sm:w-[300px] flex-shrink-0 shadow-elevation-1",
           className
         )}
         animate={{
-          width: animate ? (open ? "300px" : "80px") : "300px",
+          width: animate ? (open ? "300px" : "60px") : "300px",
         }}
         onMouseEnter={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
@@ -115,18 +115,18 @@ export const MobileSidebar = ({
     <>
       <div
         className={cn(
-          "h-10 px-4 py-4 flex flex-row md:hidden items-center justify-between bg-surface-container border-b border-outline w-full"
+          "h-8 sm:h-10 px-3 sm:px-4 py-3 sm:py-4 flex flex-row md:hidden items-center justify-between bg-surface-container border-b border-outline w-full"
         )}
       >
         <div className="flex justify-end z-20 w-full">
           <button
-            className="text-on-surface"
+            className="text-on-surface p-1"
             onClick={() => setOpen(!open)}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
+              width="20"
+              height="20"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -151,18 +151,18 @@ export const MobileSidebar = ({
                 ease: "easeInOut",
               }}
               className={cn(
-                "fixed h-full w-full inset-0 bg-surface-container p-10 z-[100] flex flex-col justify-between",
+                "fixed h-full w-full inset-0 bg-surface-container p-6 sm:p-10 z-[100] flex flex-col justify-between overflow-y-auto",
                 className
               )}
             >
               <div
-                className="absolute right-10 top-10 z-50 text-on-surface"
+                className="absolute right-6 sm:right-10 top-6 sm:top-10 z-50 text-on-surface p-1"
                 onClick={() => setOpen(!open)}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
+                  width="20"
+                  height="20"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -171,11 +171,13 @@ export const MobileSidebar = ({
                   strokeLinejoin="round"
                   className="text-on-surface"
                 >
-                  <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                  <polyline points="9,22 9,12 15,12 15,22" />
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
               </div>
-              {children}
+              <div className="mt-12 sm:mt-16">
+                {children}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -196,19 +198,21 @@ export const SidebarLink = ({
   return (
     <div
       className={cn(
-        "flex items-center justify-start gap-3 group/sidebar py-3 px-4 rounded-2xl hover:bg-primary-container transition-colors duration-200 cursor-pointer",
+        "flex items-center justify-start gap-2 sm:gap-3 group/sidebar py-2 sm:py-3 px-2 sm:px-4 rounded-xl sm:rounded-2xl hover:bg-primary-container transition-colors duration-200 cursor-pointer",
         className
       )}
       {...props}
     >
-      {link.icon}
+      <div className="flex-shrink-0">
+        {link.icon}
+      </div>
 
       <motion.span
         animate={{
           display: animate ? (open ? "inline-block" : "none") : "inline-block",
           opacity: animate ? (open ? 1 : 0) : 1,
         }}
-        className="text-on-surface text-sm group-hover/sidebar:text-on-primary-container transition duration-150 whitespace-pre inline-block !p-0 !m-0 body-medium"
+        className="text-on-surface text-xs sm:text-sm group-hover/sidebar:text-on-primary-container transition duration-150 whitespace-pre inline-block !p-0 !m-0 body-small sm:body-medium truncate"
       >
         {link.label}
       </motion.span>
