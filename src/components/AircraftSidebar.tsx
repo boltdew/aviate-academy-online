@@ -21,7 +21,9 @@ export function AircraftSidebar({ selectedContent, onContentSelect }: AircraftSi
       label: "Dashboard",
       href: "/dashboard",
       icon: (
-        <LayoutDashboard className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+        <div className="w-5 h-5 rounded-md bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+          <LayoutDashboard className="text-blue-600 dark:text-blue-400 h-3 w-3" />
+        </div>
       ),
     },
   ];
@@ -29,23 +31,25 @@ export function AircraftSidebar({ selectedContent, onContentSelect }: AircraftSi
   return (
     <div className={cn("flex flex-col md:flex-row bg-white dark:bg-neutral-900 w-full flex-1 border-r border-neutral-200 dark:border-neutral-700 overflow-hidden")}>
       <SidebarNew open={open} setOpen={setOpen}>
-        <SidebarBody className="justify-between gap-4">
+        <SidebarBody className="justify-between gap-6">
           <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
             {/* Logo */}
             {open ? <Logo /> : <LogoIcon />}
             
             {/* Navigation Links */}
-            <div className="mt-4 flex flex-col gap-1">
+            <div className="mt-6 flex flex-col gap-1">
               {links.map((link, idx) => (
                 <SidebarLink key={idx} link={link} />
               ))}
             </div>
 
             {/* Hierarchical Content Tree */}
-            <HierarchicalContentTree 
-              selectedContent={selectedContent}
-              onContentSelect={onContentSelect}
-            />
+            <div className="mt-6">
+              <HierarchicalContentTree 
+                selectedContent={selectedContent}
+                onContentSelect={onContentSelect}
+              />
+            </div>
           </div>
         </SidebarBody>
       </SidebarNew>
@@ -55,16 +59,16 @@ export function AircraftSidebar({ selectedContent, onContentSelect }: AircraftSi
 
 export const Logo = () => {
   return (
-    <div className="font-normal flex space-x-2 items-center text-sm text-black dark:text-white py-1 relative z-20">
-      <div className="h-5 w-6 bg-blue-600 dark:bg-blue-400 rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0">
-        <Plane className="h-3 w-3 text-white m-1" />
+    <div className="font-normal flex space-x-3 items-center text-sm text-black dark:text-white py-3 px-1 relative z-20">
+      <div className="h-8 w-8 bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-400 dark:to-blue-500 rounded-lg flex items-center justify-center shadow-sm">
+        <Plane className="h-4 w-4 text-white rotate-45" />
       </div>
       <motion.span
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="font-medium text-black dark:text-white whitespace-pre"
+        className="font-semibold text-neutral-900 dark:text-white whitespace-pre text-base"
       >
-        AeroLearn Docs
+        AeroLearn
       </motion.span>
     </div>
   );
@@ -72,9 +76,9 @@ export const Logo = () => {
 
 export const LogoIcon = () => {
   return (
-    <div className="font-normal flex space-x-2 items-center text-sm text-black dark:text-white py-1 relative z-20">
-      <div className="h-5 w-6 bg-blue-600 dark:bg-blue-400 rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0">
-        <Plane className="h-3 w-3 text-white m-1" />
+    <div className="font-normal flex space-x-2 items-center text-sm text-black dark:text-white py-3 px-1 relative z-20">
+      <div className="h-8 w-8 bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-400 dark:to-blue-500 rounded-lg flex items-center justify-center shadow-sm">
+        <Plane className="h-4 w-4 text-white rotate-45" />
       </div>
     </div>
   );
