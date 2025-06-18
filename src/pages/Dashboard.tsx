@@ -24,12 +24,14 @@ const Dashboard = () => {
     const handleContentSelected = (event: CustomEvent) => {
       setSelectedContent(event.detail);
       setSelectedSection(null);
+      setSelectedFunction(null);
       if (isMobile) setSidebarOpen(false);
     };
 
     const handleSectionSelected = (event: CustomEvent) => {
       setSelectedSection(event.detail);
       setSelectedContent(null);
+      setSelectedFunction(null);
       if (isMobile) setSidebarOpen(false);
     };
 
@@ -45,7 +47,7 @@ const Dashboard = () => {
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     console.log("Dashboard received search query:", query);
-    // Clear selections when searching
+    // Clear selections when searching to show search results
     setSelectedContent(null);
     setSelectedSection(null);
     setSelectedFunction(null);
@@ -55,6 +57,7 @@ const Dashboard = () => {
     setSelectedFunction(func);
     setSelectedContent(null);
     setSelectedSection(null);
+    setSearchQuery(""); // Clear search when selecting user functions
     if (isMobile) setSidebarOpen(false);
     window.dispatchEvent(new CustomEvent('userFunctionSelected', { detail: func }));
   };
@@ -63,6 +66,7 @@ const Dashboard = () => {
     setSelectedContent(content);
     setSelectedSection(null);
     setSelectedFunction(null);
+    setSearchQuery(""); // Clear search when selecting content
     if (isMobile) setSidebarOpen(false);
   };
 
@@ -70,6 +74,7 @@ const Dashboard = () => {
     setSelectedSection(section);
     setSelectedContent(null);
     setSelectedFunction(null);
+    setSearchQuery(""); // Clear search when selecting section
     if (isMobile) setSidebarOpen(false);
   };
 

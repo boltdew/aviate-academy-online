@@ -33,11 +33,24 @@ export class ContentService {
   }
 
   static searchContents(query: string): MarkdownContent[] {
-    const lowercaseQuery = query.toLowerCase();
-    return this.contents.filter(content =>
-      content.title.toLowerCase().includes(lowercaseQuery) ||
-      content.content.toLowerCase().includes(lowercaseQuery)
-    );
+    if (!query || query.trim().length === 0) {
+      return [];
+    }
+    
+    const lowercaseQuery = query.toLowerCase().trim();
+    console.log(`🔍 Searching for: "${lowercaseQuery}"`);
+    
+    const results = this.contents.filter(content => {
+      const titleMatch = content.title.toLowerCase().includes(lowercaseQuery);
+      const contentMatch = content.content.toLowerCase().includes(lowercaseQuery);
+      const chapterMatch = content.ataChapter.includes(lowercaseQuery);
+      const sectionMatch = content.subSection?.toLowerCase().includes(lowercaseQuery);
+      
+      return titleMatch || contentMatch || chapterMatch || sectionMatch;
+    });
+
+    console.log(`✅ Found ${results.length} search results`);
+    return results;
   }
 
   static getContentStats() {

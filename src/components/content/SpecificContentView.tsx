@@ -1,12 +1,16 @@
 
 import { motion } from "framer-motion";
-import { Clock, User, BookOpen, Star, Award, TrendingUp, Calendar } from "lucide-react";
+import { BookOpen, Star, Award, Bookmark, FileText, Edit3, Save, X } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { ContentService } from "@/services/contentService";
+import { BookmarkService } from "@/services/bookmarkService";
 import { Content404 } from "./Content404";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useState, useEffect } from "react";
 
 interface SpecificContentViewProps {
   selectedContent: { chapter: string; section: string; file: string };
@@ -14,6 +18,10 @@ interface SpecificContentViewProps {
 
 export function SpecificContentView({ selectedContent }: SpecificContentViewProps) {
   const isMobile = useIsMobile();
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [note, setNote] = useState("");
+  const [isEditingNote, setIsEditingNote] = useState(false);
+  const [tempNote, setTempNote] = useState("");
   
   console.log(`🎯 ContentService.getSpecificContent(${selectedContent.chapter}, ${selectedContent.section}, ${selectedContent.file})`);
   
@@ -23,6 +31,17 @@ export function SpecificContentView({ selectedContent }: SpecificContentViewProp
     selectedContent.file
   );
 
+  useEffect(() => {
+    if (content) {
+      const contentId = `${selectedContent.chapter}-${selectedContent.section}-${selectedContent.file}`;
+      setIsBookmarked(BookmarkService.isBookmarked(contentId));
+      
+      const savedNote = BookmarkService.getNote(contentId);
+      setNote(savedNote?.content || "");
+      setTempNote(savedNote?.content || "");
+    }
+  }, [content, selectedContent]);
+
   if (!content) {
     console.log("❌ Content not found");
     return <Content404 />;
@@ -30,6 +49,29 @@ export function SpecificContentView({ selectedContent }: SpecificContentViewProp
 
   console.log(`✅ Found specific content: ${content.slug}`);
   console.log(`📄 Displaying specific content: ${content.slug}`);
+
+  const contentId = `${selectedContent.chapter}-${selectedContent.section}-${selectedContent.file}`;
+
+  const handleBookmarkToggle = () => {
+    if (isBookmarked) {
+      BookmarkService.removeBookmark(contentId);
+      setIsBookmarked(false);
+    } else {
+      BookmarkService.addBookmark(contentId, content.title, selectedContent.chapter, selectedContent.section);
+      setIsBookmarked(true);
+    }
+  };
+
+  const handleSaveNote = () => {
+    BookmarkService.saveNote(contentId, tempNote);
+    setNote(tempNote);
+    setIsEditingNote(false);
+  };
+
+  const handleCancelNote = () => {
+    setTempNote(note);
+    setIsEditingNote(false);
+  };
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty?.toLowerCase()) {
@@ -77,54 +119,86 @@ export function SpecificContentView({ selectedContent }: SpecificContentViewProp
                     {content.title}
                   </CardTitle>
                 </div>
-                <div className="flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-3xl flex-shrink-0 shadow-elevation-2">
-                  <BookOpen className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
-                </div>
-              </div>
-              
-              {/* Enhanced Metadata - Responsive Grid */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-8">
-                <div className="flex items-center gap-2 sm:gap-3 p-3 sm:p-4 bg-surface-container/50 rounded-2xl backdrop-blur-sm shadow-elevation-1">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary-container rounded-2xl flex items-center justify-center flex-shrink-0">
-                    <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs sm:text-sm font-medium text-on-surface">Duration</p>
-                    <p className="text-xs text-on-surface-variant">
-                      {content.durationMinutes ? `${content.durationMinutes} min` : '15 min'}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 sm:gap-3 p-3 sm:p-4 bg-surface-container/50 rounded-2xl backdrop-blur-sm shadow-elevation-1">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-secondary-container rounded-2xl flex items-center justify-center flex-shrink-0">
-                    <User className="h-4 w-4 sm:h-5 sm:w-5 text-secondary" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs sm:text-sm font-medium text-on-surface">Type</p>
-                    <p className="text-xs text-on-surface-variant">Technical Guide</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 sm:gap-3 p-3 sm:p-4 bg-surface-container/50 rounded-2xl backdrop-blur-sm shadow-elevation-1">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-tertiary-container rounded-2xl flex items-center justify-center flex-shrink-0">
-                    <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-tertiary" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs sm:text-sm font-medium text-on-surface">Progress</p>
-                    <p className="text-xs text-on-surface-variant">Track Learning</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 sm:gap-3 p-3 sm:p-4 bg-surface-container/50 rounded-2xl backdrop-blur-sm shadow-elevation-1">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-surface-variant rounded-2xl flex items-center justify-center flex-shrink-0">
-                    <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-on-surface-variant" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs sm:text-sm font-medium text-on-surface">Updated</p>
-                    <p className="text-xs text-on-surface-variant">{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
+                <div className="flex items-center gap-3">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleBookmarkToggle}
+                    className="w-12 h-12 rounded-2xl bg-surface-container/50 hover:bg-primary-container shadow-elevation-1 hover:shadow-elevation-2"
+                  >
+                    <Bookmark className={`h-5 w-5 ${isBookmarked ? 'fill-primary text-primary' : 'text-on-surface'}`} />
+                  </Button>
+                  <div className="flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-3xl flex-shrink-0 shadow-elevation-2">
+                    <BookOpen className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
                   </div>
                 </div>
               </div>
             </div>
           </div>
+        </Card>
+
+        {/* Notes Section */}
+        <Card className="bg-surface-container border-outline shadow-elevation-2 rounded-3xl">
+          <CardHeader className="pb-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-tertiary-container rounded-2xl flex items-center justify-center">
+                  <FileText className="h-5 w-5 text-tertiary" />
+                </div>
+                <CardTitle className="text-lg font-semibold text-on-surface">Personal Notes</CardTitle>
+              </div>
+              {!isEditingNote && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsEditingNote(true)}
+                  className="h-8 px-3 rounded-xl hover:bg-primary-container"
+                >
+                  <Edit3 className="h-4 w-4 mr-2" />
+                  Edit
+                </Button>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent className="pt-0">
+            {isEditingNote ? (
+              <div className="space-y-4">
+                <Textarea
+                  value={tempNote}
+                  onChange={(e) => setTempNote(e.target.value)}
+                  placeholder="Add your personal notes about this content..."
+                  className="min-h-[120px] rounded-2xl border-outline-variant focus:border-primary resize-none"
+                />
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleSaveNote}
+                    size="sm"
+                    className="h-8 px-4 rounded-xl bg-primary hover:bg-primary/90"
+                  >
+                    <Save className="h-4 w-4 mr-2" />
+                    Save
+                  </Button>
+                  <Button
+                    onClick={handleCancelNote}
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 px-4 rounded-xl hover:bg-surface-container-high"
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="min-h-[60px] p-4 bg-surface-container-high/50 rounded-2xl border border-outline-variant">
+                {note ? (
+                  <p className="text-on-surface whitespace-pre-wrap text-sm leading-relaxed">{note}</p>
+                ) : (
+                  <p className="text-on-surface-variant text-sm italic">No notes added yet. Click Edit to add your personal notes.</p>
+                )}
+              </div>
+            )}
+          </CardContent>
         </Card>
 
         {/* Enhanced Content Card */}
