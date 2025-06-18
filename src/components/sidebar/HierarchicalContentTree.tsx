@@ -8,9 +8,11 @@ import {
   FileText,
   BookOpen,
   Grid3X3,
+  Bookmark,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ContentService } from "@/services/contentService";
+import { BookmarkService } from "@/services/bookmarkService";
 import { useMaterialSidebar } from "@/components/ui/material-sidebar";
 
 interface HierarchicalContentTreeProps {
@@ -28,9 +30,21 @@ export function HierarchicalContentTree({
 }: HierarchicalContentTreeProps) {
   const [expandedChapters, setExpandedChapters] = useState<Set<string>>(new Set());
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
+  const [bookmarks, setBookmarks] = useState<any[]>([]);
   const { isOpen } = useMaterialSidebar();
 
   const contentStructure = ContentService.getContentStructure();
+
+  // Load bookmarks
+  useEffect(() => {
+    setBookmarks(BookmarkService.getBookmarks());
+  }, []);
+
+  // Check if content is bookmarked
+  const isContentBookmarked = (chapter: string, section: string, file: string) => {
+    const contentId = `${chapter}-${section}-${file}`;
+    return BookmarkService.isBookmarked(contentId);
+  };
 
   // Auto-collapse logic: only keep currently selected chapter/section expanded
   useEffect(() => {
@@ -217,28 +231,36 @@ export function HierarchicalContentTree({
                         {/* Files Level */}
                         {isSectionExpanded && (
                           <div className="ml-4 space-y-1 border-l border-outline-variant pl-3">
-                            {sectionData.files.map((file) => (
-                              <div
-                                key={file.id}
-                                className={cn(
-                                  "flex items-center px-3 py-2 text-sm transition-all duration-200 hover:bg-primary-container cursor-pointer rounded-lg group",
-                                  selectedContent?.chapter === chapterCode && 
-                                  selectedContent?.section === sectionKey && 
-                                  selectedContent?.file === file.slug &&
-                                  "bg-primary-container text-on-primary-container font-medium shadow-elevation-1",
-                                )}
-                                onClick={() => handleContentSelect(chapterCode, sectionKey, file.slug)}
-                              >
-                                <div className="flex items-center gap-2 flex-1 min-w-0">
-                                  <div className="w-3 h-3 rounded bg-surface-variant flex items-center justify-center flex-shrink-0">
-                                    <FileText className="h-2 w-2 text-on-surface-variant" />
+                            {sectionData.files.map((file) => {
+                              const isBookmarked = isContentBookmarked(chapterCode, sectionKey, file.slug);
+                              const isSelected = selectedContent?.chapter === chapterCode && 
+                                selectedContent?.section === sectionKey && 
+                                selectedContent?.file === file.slug;
+                              
+                              return (
+                                <div
+                                  key={file.id}
+                                  className={cn(
+                                    "flex items-center px-3 py-2 text-sm transition-all duration-200 hover:bg-primary-container cursor-pointer rounded-lg group",
+                                    isSelected &&
+                                    "bg-primary-container text-on-primary-container font-medium shadow-elevation-1",
+                                  )}
+                                  onClick={() => handleContentSelect(chapterCode, sectionKey, file.slug)}
+                                >
+                                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                                    <div className="w-3 h-3 rounded bg-surface-variant flex items-center justify-center flex-shrink-0">
+                                      <FileText className="h-2 w-2 text-on-surface-variant" />
+                                    </div>
+                                    <span className="text-on-surface text-sm truncate group-hover:text-on-primary-container transition-colors">
+                                      {file.title}
+                                    </span>
+                                    {isBookmarked && (
+                                      <Bookmark className="h-3 w-3 text-primary fill-primary flex-shrink-0" />
+                                    )}
                                   </div>
-                                  <span className="text-on-surface text-sm truncate group-hover:text-on-primary-container transition-colors">
-                                    {file.title}
-                                  </span>
                                 </div>
-                              </div>
-                            ))}
+                              );
+                            })}
                           </div>
                         )}
                       </div>

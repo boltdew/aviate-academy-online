@@ -45,8 +45,8 @@ const Dashboard = () => {
   }, [isMobile]);
 
   const handleSearch = (query: string) => {
+    console.log("🔍 Dashboard handleSearch called with:", query);
     setSearchQuery(query);
-    console.log("Dashboard received search query:", query);
     // Clear selections when searching to show search results
     setSelectedContent(null);
     setSelectedSection(null);

@@ -53,13 +53,13 @@ const plans = [
 
 const Pricing = () => {
   return (
-    <section className="py-24 bg-slate-50">
+    <section className="py-24 bg-surface-container">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-on-surface mb-4 headline-large">
             Choose Your Learning Plan
           </h2>
-          <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+          <p className="text-xl text-on-surface-variant max-w-3xl mx-auto body-large">
             Start your aircraft engineering journey with flexible pricing that scales with your needs.
           </p>
         </div>
@@ -68,40 +68,40 @@ const Pricing = () => {
           {plans.map((plan, index) => (
             <div 
               key={index} 
-              className={`relative bg-white rounded-2xl shadow-lg p-8 ${
-                plan.popular ? 'ring-2 ring-blue-600 scale-105' : ''
+              className={`relative bg-surface-container-high rounded-3xl shadow-elevation-2 p-8 border ${
+                plan.popular ? 'border-primary ring-2 ring-primary/20 scale-105' : 'border-outline-variant'
               }`}
             >
               {plan.popular && (
-                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-semibold">
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-primary text-on-primary px-4 py-2 rounded-full text-sm font-semibold shadow-elevation-3">
                   Most Popular
                 </div>
               )}
               
               <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold text-slate-900 mb-2">{plan.name}</h3>
-                <p className="text-slate-600 mb-4">{plan.description}</p>
+                <h3 className="text-2xl font-bold text-on-surface mb-2 title-large">{plan.name}</h3>
+                <p className="text-on-surface-variant mb-4 body-medium">{plan.description}</p>
                 
                 <div className="flex items-end justify-center">
-                  <span className="text-4xl font-bold text-slate-900">{plan.price}</span>
-                  <span className="text-slate-600 ml-1">{plan.period}</span>
+                  <span className="text-4xl font-bold text-on-surface headline-medium">{plan.price}</span>
+                  <span className="text-on-surface-variant ml-1 body-medium">{plan.period}</span>
                 </div>
               </div>
               
               <ul className="space-y-4 mb-8">
                 {plan.features.map((feature, featureIndex) => (
                   <li key={featureIndex} className="flex items-start">
-                    <Check className="h-5 w-5 text-green-500 mt-0.5 mr-3 flex-shrink-0" />
-                    <span className="text-slate-600">{feature}</span>
+                    <Check className="h-5 w-5 text-primary mt-0.5 mr-3 flex-shrink-0" />
+                    <span className="text-on-surface-variant body-medium">{feature}</span>
                   </li>
                 ))}
               </ul>
               
               <Button 
-                className={`w-full py-3 ${
+                className={`w-full py-3 rounded-2xl shadow-elevation-2 ${
                   plan.popular 
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-                    : 'bg-slate-100 hover:bg-slate-200 text-slate-900'
+                    ? 'bg-primary hover:bg-primary/90 text-on-primary' 
+                    : 'bg-surface-container-highest hover:bg-primary hover:text-on-primary text-on-surface border border-outline'
                 }`}
                 size="lg"
               >
@@ -112,7 +112,7 @@ const Pricing = () => {
         </div>
         
         <div className="text-center mt-12">
-          <p className="text-slate-600">
+          <p className="text-on-surface-variant body-medium">
             All plans include a 14-day free trial. No credit card required.
           </p>
         </div>

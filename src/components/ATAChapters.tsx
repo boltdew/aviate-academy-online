@@ -16,13 +16,13 @@ const ataChapters = [
 
 const ATAChapters = () => {
   return (
-    <section className="py-24 bg-white">
+    <section className="py-24 bg-surface-container">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4">
+          <h2 className="text-3xl lg:text-4xl font-bold text-on-surface mb-4 headline-large">
             Organized by ATA Chapters
           </h2>
-          <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+          <p className="text-xl text-on-surface-variant max-w-3xl mx-auto body-large">
             Content systematically organized following the Air Transport Association specification for aircraft maintenance documentation.
           </p>
         </div>
@@ -31,23 +31,23 @@ const ATAChapters = () => {
           {ataChapters.map((chapter, index) => (
             <div 
               key={index} 
-              className="relative bg-gradient-to-r from-slate-900 to-blue-900 text-white p-6 rounded-xl hover:shadow-xl transition-all duration-300 group hover:scale-105 cursor-pointer"
+              className="relative bg-gradient-to-r from-primary-container to-secondary-container text-on-primary-container p-6 rounded-3xl hover:shadow-elevation-3 transition-all duration-300 group hover:scale-105 cursor-pointer border border-outline-variant"
             >
               {chapter.popular && (
-                <div className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full font-semibold">
+                <div className="absolute -top-2 -right-2 bg-error text-on-error text-xs px-2 py-1 rounded-full font-semibold shadow-elevation-2">
                   Popular
                 </div>
               )}
               
-              <div className="text-2xl font-bold text-blue-400 mb-2">
+              <div className="text-2xl font-bold text-primary mb-2 title-large">
                 ATA {chapter.code}
               </div>
               
-              <div className="text-sm font-medium">
+              <div className="text-sm font-medium body-medium">
                 {chapter.title}
               </div>
               
-              <div className="mt-4 text-xs text-slate-300">
+              <div className="mt-4 text-xs text-on-surface-variant body-small">
                 Click to explore →
               </div>
             </div>
@@ -55,10 +55,10 @@ const ATAChapters = () => {
         </div>
         
         <div className="text-center mt-12">
-          <p className="text-slate-600 mb-6">
+          <p className="text-on-surface-variant mb-6 body-large">
             And many more chapters covering the complete aircraft systems spectrum
           </p>
-          <button className="text-blue-600 hover:text-blue-700 font-semibold text-lg hover:underline">
+          <button className="text-primary hover:text-primary/80 font-semibold text-lg hover:underline title-medium">
             View All ATA Chapters →
           </button>
         </div>
