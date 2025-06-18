@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Menu, Bell, User, Settings, Sun, Moon } from "lucide-react";
+import { Search, Bell, User, Settings, Sun, Moon, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -43,45 +43,53 @@ export function AppHeader({ onMenuToggle, onSearch, onUserFunctionSelect }: AppH
   };
 
   return (
-    <header className="flex items-center justify-between gap-2 sm:gap-4 px-3 sm:px-6 py-3 sm:py-4 border-b bg-surface-container border-outline shadow-elevation-1 flex-shrink-0 h-16">
-      {/* Left Section - Menu and Title */}
-      <div className="flex items-center gap-2 sm:gap-4 min-w-0">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onMenuToggle}
-          className="md:hidden flex-shrink-0"
-        >
-          <Menu className="h-5 w-5" />
-        </Button>
-        <h1 className="text-sm sm:text-xl font-semibold text-on-surface title-large truncate">
-          <span className="hidden sm:inline">Aircraft Engineering Dashboard</span>
-          <span className="sm:hidden">AeroLearn</span>
-        </h1>
+    <header className="flex items-center justify-between gap-6 px-8 py-4 border-b bg-surface-container border-outline shadow-elevation-2 flex-shrink-0 h-20">
+      {/* Left Section - Brand */}
+      <div className="flex items-center gap-4 min-w-0">
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 bg-primary rounded-2xl flex items-center justify-center shadow-elevation-2">
+            <Sparkles className="h-5 w-5 text-on-primary" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-on-surface title-large">
+              AeroLearn Pro
+            </h1>
+            <p className="text-sm text-on-surface-variant body-small">
+              Advanced Aircraft Engineering Platform
+            </p>
+          </div>
+        </div>
       </div>
 
-      {/* Center Section - Search Bar */}
-      <div className="flex-1 max-w-xs sm:max-w-md mx-2 sm:mx-4">
+      {/* Center Section - Enhanced Search */}
+      <div className="flex-1 max-w-2xl mx-8">
         <form onSubmit={handleSearch} className="relative">
-          <Search className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 h-3 w-3 sm:h-4 sm:w-4 text-on-surface-variant" />
-          <Input
-            type="text"
-            placeholder="Search..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-8 sm:pl-10 pr-2 text-sm bg-surface-container-high border-outline-variant rounded-2xl focus:border-primary h-8 sm:h-10"
-          />
+          <div className="relative group">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-on-surface-variant group-focus-within:text-primary transition-colors" />
+            <Input
+              type="text"
+              placeholder="Search aircraft systems, components, or procedures..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-12 pr-4 h-12 text-base bg-surface-container-high border-outline-variant rounded-3xl focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-elevation-1 hover:shadow-elevation-2 transition-all duration-200"
+            />
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+              <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 rounded-lg px-2 py-1 text-xs">
+                ⌘K
+              </Badge>
+            </div>
+          </div>
         </form>
       </div>
 
-      {/* Right Section - Actions and User Menu */}
-      <div className="flex items-center gap-1 sm:gap-3">
-        {/* Dark Mode Toggle - Hidden on mobile */}
+      {/* Right Section - Enhanced Actions */}
+      <div className="flex items-center gap-4">
+        {/* Dark Mode Toggle */}
         <Button
           variant="ghost"
           size="icon"
           onClick={toggleDarkMode}
-          className="hidden sm:flex rounded-2xl hover:bg-primary-container"
+          className="w-11 h-11 rounded-2xl hover:bg-primary-container shadow-elevation-1 hover:shadow-elevation-2 transition-all duration-200"
         >
           {isDarkMode ? (
             <Sun className="h-5 w-5 text-on-surface" />
@@ -90,84 +98,82 @@ export function AppHeader({ onMenuToggle, onSearch, onUserFunctionSelect }: AppH
           )}
         </Button>
 
-        {/* Notifications - Hidden on mobile */}
-        <div className="relative hidden sm:block">
+        {/* Notifications */}
+        <div className="relative">
           <Button
             variant="ghost"
             size="icon"
-            className="rounded-2xl hover:bg-primary-container"
+            className="w-11 h-11 rounded-2xl hover:bg-primary-container shadow-elevation-1 hover:shadow-elevation-2 transition-all duration-200"
           >
             <Bell className="h-5 w-5 text-on-surface" />
             <Badge 
-              className="absolute -top-1 -right-1 h-4 w-4 sm:h-5 sm:w-5 rounded-full bg-error text-on-error p-0 flex items-center justify-center text-xs"
+              className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-error text-on-error p-0 flex items-center justify-center text-xs shadow-elevation-1"
             >
               3
             </Badge>
           </Button>
         </div>
 
-        {/* User Menu */}
+        {/* Divider */}
+        <div className="w-px h-8 bg-outline-variant"></div>
+
+        {/* Enhanced User Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
-              className="flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-2 rounded-2xl hover:bg-primary-container"
+              className="flex items-center gap-3 px-4 py-2 h-12 rounded-2xl hover:bg-primary-container shadow-elevation-1 hover:shadow-elevation-2 transition-all duration-200"
             >
-              <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-primary-container flex items-center justify-center">
-                <User className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
+              <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-elevation-1">
+                <User className="h-4 w-4 text-on-primary" />
               </div>
-              <div className="hidden lg:block text-left">
+              <div className="text-left">
                 <p className="text-sm font-medium text-on-surface">
-                  {user?.fullName || "User"}
+                  {user?.fullName || "Alex Johnson"}
                 </p>
-                <p className="text-xs text-on-surface-variant">
-                  Premium Member
-                </p>
+                <div className="flex items-center gap-2">
+                  <p className="text-xs text-on-surface-variant">
+                    Premium Member
+                  </p>
+                  <Badge className="bg-tertiary text-on-tertiary px-2 py-0.5 rounded-lg text-xs">
+                    Pro
+                  </Badge>
+                </div>
               </div>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="end"
-            className="w-48 sm:w-56 bg-surface-container border-outline shadow-elevation-2 rounded-2xl"
+            className="w-64 bg-surface-container border-outline shadow-elevation-3 rounded-3xl p-2"
           >
-            <DropdownMenuLabel className="text-on-surface">
-              My Account
+            <DropdownMenuLabel className="text-on-surface px-3 py-2">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                  <User className="h-5 w-5 text-on-primary" />
+                </div>
+                <div>
+                  <p className="font-medium">{user?.fullName || "Alex Johnson"}</p>
+                  <p className="text-xs text-on-surface-variant">{user?.emailAddresses?.[0]?.emailAddress || "alex@example.com"}</p>
+                </div>
+              </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-outline-variant" />
+            <DropdownMenuSeparator className="bg-outline-variant my-2" />
             <DropdownMenuItem 
               onClick={() => handleUserFunction('profile')}
-              className="hover:bg-primary-container hover:text-on-primary-container rounded-xl mx-1"
+              className="hover:bg-primary-container hover:text-on-primary-container rounded-2xl mx-1 px-3 py-2.5"
             >
-              <User className="mr-2 h-4 w-4" />
-              Profile
+              <User className="mr-3 h-4 w-4" />
+              Profile & Settings
             </DropdownMenuItem>
             <DropdownMenuItem 
               onClick={() => handleUserFunction('stats')}
-              className="hover:bg-primary-container hover:text-on-primary-container rounded-xl mx-1"
+              className="hover:bg-secondary-container hover:text-on-secondary-container rounded-2xl mx-1 px-3 py-2.5"
             >
-              <Settings className="mr-2 h-4 w-4" />
-              Statistics
+              <Settings className="mr-3 h-4 w-4" />
+              Learning Analytics
             </DropdownMenuItem>
-            <DropdownMenuItem 
-              onClick={() => handleUserFunction('settings')}
-              className="hover:bg-primary-container hover:text-on-primary-container rounded-xl mx-1"
-            >
-              <Settings className="mr-2 h-4 w-4" />
-              Settings
-            </DropdownMenuItem>
-            {/* Mobile-only options */}
-            <div className="sm:hidden">
-              <DropdownMenuSeparator className="bg-outline-variant" />
-              <DropdownMenuItem 
-                onClick={toggleDarkMode}
-                className="hover:bg-primary-container hover:text-on-primary-container rounded-xl mx-1"
-              >
-                {isDarkMode ? <Sun className="mr-2 h-4 w-4" /> : <Moon className="mr-2 h-4 w-4" />}
-                {isDarkMode ? 'Light Mode' : 'Dark Mode'}
-              </DropdownMenuItem>
-            </div>
-            <DropdownMenuSeparator className="bg-outline-variant" />
-            <DropdownMenuItem className="hover:bg-error-container hover:text-on-error-container rounded-xl mx-1">
+            <DropdownMenuSeparator className="bg-outline-variant my-2" />
+            <DropdownMenuItem className="hover:bg-error-container hover:text-on-error-container rounded-2xl mx-1 px-3 py-2.5">
               Sign out
             </DropdownMenuItem>
           </DropdownMenuContent>

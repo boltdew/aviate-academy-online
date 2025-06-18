@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { SidebarNew, SidebarBody, SidebarLink } from "@/components/ui/sidebar-new";
-import { LayoutDashboard, Plane, User, Settings, BarChart3 } from "lucide-react";
+import { LayoutDashboard, Plane, User, Settings, BarChart3, Sparkles, Award, BookOpen } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { HierarchicalContentTree } from "./sidebar/HierarchicalContentTree";
@@ -14,16 +14,16 @@ interface AircraftSidebarProps {
 }
 
 export function AircraftSidebar({ selectedContent, onContentSelect }: AircraftSidebarProps) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const [selectedFunction, setSelectedFunction] = useState<string | null>(null);
 
   const links = [
     {
-      label: "Dashboard",
+      label: "Dashboard Overview",
       href: "/dashboard",
       icon: (
-        <div className="w-6 h-6 rounded-xl bg-primary-container flex items-center justify-center shadow-elevation-1">
-          <LayoutDashboard className="text-primary h-4 w-4" />
+        <div className="w-7 h-7 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-elevation-2">
+          <LayoutDashboard className="text-on-primary h-4 w-4" />
         </div>
       ),
       onClick: () => {
@@ -35,28 +35,28 @@ export function AircraftSidebar({ selectedContent, onContentSelect }: AircraftSi
 
   const userFunctions = [
     {
-      label: "Profile",
+      label: "Profile & Achievements",
       function: "profile",
       icon: (
-        <div className="w-6 h-6 rounded-xl bg-secondary-container flex items-center justify-center shadow-elevation-1">
-          <User className="text-secondary h-4 w-4" />
+        <div className="w-7 h-7 rounded-2xl bg-gradient-to-br from-secondary to-secondary/80 flex items-center justify-center shadow-elevation-2">
+          <User className="text-on-secondary h-4 w-4" />
         </div>
       ),
     },
     {
-      label: "Statistics",
+      label: "Learning Analytics",
       function: "stats",
       icon: (
-        <div className="w-6 h-6 rounded-xl bg-tertiary-container flex items-center justify-center shadow-elevation-1">
-          <BarChart3 className="text-tertiary h-4 w-4" />
+        <div className="w-7 h-7 rounded-2xl bg-gradient-to-br from-tertiary to-tertiary/80 flex items-center justify-center shadow-elevation-2">
+          <BarChart3 className="text-on-tertiary h-4 w-4" />
         </div>
       ),
     },
     {
-      label: "Settings",
+      label: "Premium Settings",
       function: "settings",
       icon: (
-        <div className="w-6 h-6 rounded-xl bg-surface-variant flex items-center justify-center shadow-elevation-1">
+        <div className="w-7 h-7 rounded-2xl bg-gradient-to-br from-surface-variant to-surface-container-high flex items-center justify-center shadow-elevation-2">
           <Settings className="text-on-surface-variant h-4 w-4" />
         </div>
       ),
@@ -70,28 +70,36 @@ export function AircraftSidebar({ selectedContent, onContentSelect }: AircraftSi
 
   return (
     <SidebarNew open={open} setOpen={setOpen}>
-      <SidebarBody className="justify-between gap-6">
+      <SidebarBody className="justify-between gap-8">
         <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-          {/* Logo */}
+          {/* Enhanced Logo */}
           {open ? <Logo /> : <LogoIcon />}
           
-          {/* Navigation Links */}
-          <div className="mt-6 flex flex-col gap-2">
+          {/* Main Navigation */}
+          <div className="mt-8 flex flex-col gap-3">
+            <div className="px-2 mb-4">
+              <h3 className="text-xs font-bold text-on-surface-variant uppercase tracking-wider label-small opacity-80">
+                Main Navigation
+              </h3>
+            </div>
             {links.map((link, idx) => (
               <SidebarLink 
                 key={idx} 
                 link={link} 
                 onClick={link.onClick}
-                className={selectedFunction === null && selectedContent === null ? "bg-primary-container" : ""}
+                className={cn(
+                  "shadow-elevation-1 hover:shadow-elevation-3 transition-all duration-300",
+                  selectedFunction === null && selectedContent === null ? "bg-primary-container shadow-elevation-2" : ""
+                )}
               />
             ))}
           </div>
 
-          {/* User Functions */}
-          <div className="mt-6">
-            <div className="px-4 mb-3">
-              <h3 className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
-                User Functions
+          {/* Enhanced User Functions */}
+          <div className="mt-8">
+            <div className="px-2 mb-4">
+              <h3 className="text-xs font-bold text-on-surface-variant uppercase tracking-wider label-small opacity-80">
+                Personal Space
               </h3>
             </div>
             <div className="flex flex-col gap-2">
@@ -99,8 +107,8 @@ export function AircraftSidebar({ selectedContent, onContentSelect }: AircraftSi
                 <div
                   key={idx}
                   className={cn(
-                    "flex items-center justify-start gap-3 group/sidebar py-3 px-4 rounded-2xl hover:bg-primary-container transition-colors duration-200 cursor-pointer",
-                    selectedFunction === func.function ? "bg-primary-container" : ""
+                    "flex items-center justify-start gap-3 group/sidebar py-3 px-4 rounded-2xl hover:bg-primary-container transition-all duration-300 cursor-pointer shadow-elevation-1 hover:shadow-elevation-3",
+                    selectedFunction === func.function ? "bg-primary-container shadow-elevation-2" : ""
                   )}
                   onClick={() => handleFunctionSelect(func.function)}
                 >
@@ -110,7 +118,7 @@ export function AircraftSidebar({ selectedContent, onContentSelect }: AircraftSi
                       display: open ? "inline-block" : "none",
                       opacity: open ? 1 : 0,
                     }}
-                    className="text-on-surface text-sm group-hover/sidebar:text-on-primary-container transition duration-150 whitespace-pre inline-block !p-0 !m-0 body-medium"
+                    className="text-on-surface text-sm group-hover/sidebar:text-on-primary-container transition duration-300 whitespace-pre inline-block !p-0 !m-0 body-medium font-medium"
                   >
                     {func.label}
                   </motion.span>
@@ -119,10 +127,10 @@ export function AircraftSidebar({ selectedContent, onContentSelect }: AircraftSi
             </div>
           </div>
 
-          {/* Hierarchical Content Tree */}
-          <div className="mt-6">
-            <div className="px-4 mb-3">
-              <h3 className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
+          {/* Enhanced Content Tree */}
+          <div className="mt-8 flex-1">
+            <div className="px-2 mb-4">
+              <h3 className="text-xs font-bold text-on-surface-variant uppercase tracking-wider label-small opacity-80">
                 Learning Content
               </h3>
             </div>
@@ -133,6 +141,21 @@ export function AircraftSidebar({ selectedContent, onContentSelect }: AircraftSi
                 onContentSelect(content);
               }}
             />
+          </div>
+        </div>
+
+        {/* Enhanced Footer */}
+        <div className="border-t border-outline-variant pt-6">
+          <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-tertiary-container/30 shadow-elevation-1">
+            <div className="w-6 h-6 rounded-xl bg-tertiary flex items-center justify-center">
+              <Award className="h-3 w-3 text-on-tertiary" />
+            </div>
+            {open && (
+              <div className="flex-1">
+                <p className="text-xs font-medium text-on-surface label-medium">Premium Active</p>
+                <p className="text-xs text-on-surface-variant body-small">Level 12 Engineer</p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -147,26 +170,31 @@ export function AircraftSidebar({ selectedContent, onContentSelect }: AircraftSi
 
 export const Logo = () => {
   return (
-    <div className="font-normal flex space-x-3 items-center text-sm text-on-surface py-4 px-2 relative z-20">
-      <div className="h-10 w-10 bg-primary rounded-2xl flex items-center justify-center shadow-elevation-2">
-        <Plane className="h-5 w-5 text-on-primary rotate-45" />
+    <div className="font-normal flex space-x-4 items-center text-sm text-on-surface py-6 px-2 relative z-20">
+      <div className="h-12 w-12 bg-gradient-to-br from-primary via-secondary to-tertiary rounded-3xl flex items-center justify-center shadow-elevation-3">
+        <Plane className="h-6 w-6 text-on-primary rotate-45" />
       </div>
-      <motion.span
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="font-semibold text-on-surface whitespace-pre title-large"
+        className="flex flex-col"
       >
-        AeroLearn
-      </motion.span>
+        <span className="font-bold text-on-surface whitespace-pre title-medium">
+          AeroLearn Pro
+        </span>
+        <span className="text-xs text-on-surface-variant body-small opacity-80">
+          Advanced Engineering Platform
+        </span>
+      </motion.div>
     </div>
   );
 };
 
 export const LogoIcon = () => {
   return (
-    <div className="font-normal flex space-x-2 items-center text-sm text-on-surface py-4 px-2 relative z-20">
-      <div className="h-10 w-10 bg-primary rounded-2xl flex items-center justify-center shadow-elevation-2">
-        <Plane className="h-5 w-5 text-on-primary rotate-45" />
+    <div className="font-normal flex space-x-2 items-center text-sm text-on-surface py-6 px-2 relative z-20">
+      <div className="h-12 w-12 bg-gradient-to-br from-primary via-secondary to-tertiary rounded-3xl flex items-center justify-center shadow-elevation-3">
+        <Plane className="h-6 w-6 text-on-primary rotate-45" />
       </div>
     </div>
   );

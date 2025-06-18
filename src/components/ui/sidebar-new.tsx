@@ -37,7 +37,7 @@ export const SidebarProvider = ({
   setOpen?: React.Dispatch<React.SetStateAction<boolean>>;
   animate?: boolean;
 }) => {
-  const [openState, setOpenState] = useState(false);
+  const [openState, setOpenState] = useState(true); // Default to open for desktop
 
   const open = openProp !== undefined ? openProp : openState;
   const setOpen = setOpenProp !== undefined ? setOpenProp : setOpenState;
@@ -73,10 +73,7 @@ export const SidebarBody = ({
   ...props 
 }: React.HTMLAttributes<HTMLDivElement>) => {
   return (
-    <>
-      <DesktopSidebar className={className} {...props}>{children}</DesktopSidebar>
-      <MobileSidebar className={className} {...props}>{children}</MobileSidebar>
-    </>
+    <DesktopSidebar className={className} {...props}>{children}</DesktopSidebar>
   );
 };
 
@@ -87,102 +84,19 @@ export const DesktopSidebar = ({
 }: React.HTMLAttributes<HTMLDivElement>) => {
   const { open, setOpen, animate } = useSidebarNew();
   return (
-    <>
-      <motion.div
-        className={cn(
-          "h-full px-2 sm:px-4 py-3 sm:py-4 hidden md:flex md:flex-col bg-surface-container border-r border-outline w-[240px] sm:w-[300px] flex-shrink-0 shadow-elevation-1",
-          className
-        )}
-        animate={{
-          width: animate ? (open ? "300px" : "60px") : "300px",
-        }}
-        onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
-      >
-        {children}
-      </motion.div>
-    </>
-  );
-};
-
-export const MobileSidebar = ({
-  className,
-  children,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) => {
-  const { open, setOpen } = useSidebarNew();
-  return (
-    <>
-      <div
-        className={cn(
-          "h-8 sm:h-10 px-3 sm:px-4 py-3 sm:py-4 flex flex-row md:hidden items-center justify-between bg-surface-container border-b border-outline w-full"
-        )}
-      >
-        <div className="flex justify-end z-20 w-full">
-          <button
-            className="text-on-surface p-1"
-            onClick={() => setOpen(!open)}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="text-on-surface"
-            >
-              <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-              <polyline points="9,22 9,12 15,12 15,22" />
-            </svg>
-          </button>
-        </div>
-        <AnimatePresence>
-          {open && (
-            <motion.div
-              initial={{ x: "-100%", opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: "-100%", opacity: 0 }}
-              transition={{
-                duration: 0.3,
-                ease: "easeInOut",
-              }}
-              className={cn(
-                "fixed h-full w-full inset-0 bg-surface-container p-6 sm:p-10 z-[100] flex flex-col justify-between overflow-y-auto",
-                className
-              )}
-            >
-              <div
-                className="absolute right-6 sm:right-10 top-6 sm:top-10 z-50 text-on-surface p-1"
-                onClick={() => setOpen(!open)}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="text-on-surface"
-                >
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-              </div>
-              <div className="mt-12 sm:mt-16">
-                {children}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    </>
+    <motion.div
+      className={cn(
+        "h-full px-4 py-6 flex flex-col bg-surface-container w-[320px] flex-shrink-0 shadow-elevation-2",
+        className
+      )}
+      animate={{
+        width: animate ? (open ? "320px" : "80px") : "320px",
+      }}
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+    >
+      {children}
+    </motion.div>
   );
 };
 
@@ -198,7 +112,7 @@ export const SidebarLink = ({
   return (
     <div
       className={cn(
-        "flex items-center justify-start gap-2 sm:gap-3 group/sidebar py-2 sm:py-3 px-2 sm:px-4 rounded-xl sm:rounded-2xl hover:bg-primary-container transition-colors duration-200 cursor-pointer",
+        "flex items-center justify-start gap-3 group/sidebar py-3 px-4 rounded-2xl hover:bg-primary-container transition-all duration-300 cursor-pointer shadow-elevation-1 hover:shadow-elevation-2",
         className
       )}
       {...props}
@@ -212,7 +126,7 @@ export const SidebarLink = ({
           display: animate ? (open ? "inline-block" : "none") : "inline-block",
           opacity: animate ? (open ? 1 : 0) : 1,
         }}
-        className="text-on-surface text-xs sm:text-sm group-hover/sidebar:text-on-primary-container transition duration-150 whitespace-pre inline-block !p-0 !m-0 body-small sm:body-medium truncate"
+        className="text-on-surface text-sm group-hover/sidebar:text-on-primary-container transition duration-300 whitespace-pre inline-block !p-0 !m-0 body-medium truncate font-medium"
       >
         {link.label}
       </motion.span>

@@ -43,28 +43,17 @@ const Dashboard = () => {
           onUserFunctionSelect={handleUserFunctionSelect}
           onMenuToggle={handleMenuToggle}
         />
-        <div className="flex flex-1 min-h-0 relative">
-          {/* Mobile Overlay */}
-          {sidebarOpen && (
-            <div 
-              className="fixed inset-0 bg-black/50 z-40 md:hidden"
-              onClick={() => setSidebarOpen(false)}
-            />
-          )}
-          
-          {/* Sidebar */}
-          <div className={cn(
-            "fixed left-0 top-16 h-[calc(100vh-4rem)] z-50 transform transition-transform duration-300 md:relative md:top-0 md:h-full md:translate-x-0",
-            sidebarOpen ? "translate-x-0" : "-translate-x-full"
-          )}>
+        <div className="flex flex-1 min-h-0">
+          {/* Sidebar - Fixed width, no responsive behavior */}
+          <div className="w-[320px] flex-shrink-0 border-r border-outline bg-surface-container">
             <AircraftSidebar 
               selectedContent={selectedContent}
               onContentSelect={handleContentSelect}
             />
           </div>
           
-          {/* Main Content */}
-          <main className="flex-1 overflow-hidden w-full md:w-auto">
+          {/* Main Content - Takes remaining space */}
+          <main className="flex-1 overflow-hidden bg-surface-container-lowest">
             <ContentArea 
               selectedContent={selectedContent}
               searchQuery={searchQuery}
