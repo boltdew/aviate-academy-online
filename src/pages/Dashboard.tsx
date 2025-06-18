@@ -70,7 +70,7 @@ const Dashboard = () => {
 
   return (
     <ErrorBoundary>
-      <div className={cn("flex flex-col h-screen w-full bg-surface-container-lowest overflow-hidden")}>
+      <div className="flex flex-col h-screen w-full bg-surface-container-lowest overflow-hidden">
         <AppHeader 
           onSearch={handleSearch}
           onUserFunctionSelect={handleUserFunctionSelect}
@@ -80,7 +80,7 @@ const Dashboard = () => {
           {/* Mobile Sidebar Overlay */}
           {isMobile && sidebarOpen && (
             <div 
-              className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+              className="fixed inset-0 bg-black/50 z-40"
               onClick={() => setSidebarOpen(false)}
             />
           )}
@@ -90,9 +90,9 @@ const Dashboard = () => {
             "border-r border-outline bg-surface-container transition-all duration-300 ease-in-out z-50",
             isMobile ? (
               sidebarOpen 
-                ? "fixed left-0 top-16 bottom-0 w-80 shadow-elevation-4" 
+                ? "fixed left-0 top-16 bottom-0 w-72 sm:w-80 shadow-elevation-4" 
                 : "hidden"
-            ) : "w-80 flex-shrink-0 relative"
+            ) : "w-72 lg:w-80 xl:w-96 flex-shrink-0 relative"
           )}>
             <AircraftSidebar 
               selectedContent={selectedContent}
@@ -103,10 +103,7 @@ const Dashboard = () => {
           </div>
           
           {/* Main Content */}
-          <main className={cn(
-            "flex-1 overflow-hidden bg-surface-container-lowest",
-            isMobile && "w-full"
-          )}>
+          <main className="flex-1 overflow-hidden bg-surface-container-lowest">
             <ContentArea 
               selectedContent={selectedContent}
               selectedSection={selectedSection}
