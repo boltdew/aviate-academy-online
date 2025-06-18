@@ -1,10 +1,8 @@
 
 "use client";
-
 import { cn } from "@/lib/utils";
-import React, { useState, createContext, useContext } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import React, { createContext, useContext, useState } from "react";
 
 interface Links {
   label: string;
@@ -18,9 +16,7 @@ interface SidebarContextProps {
   animate: boolean;
 }
 
-const SidebarContext = createContext<SidebarContextProps | undefined>(
-  undefined
-);
+const SidebarContext = createContext<SidebarContextProps | undefined>(undefined);
 
 export const useSidebarNew = () => {
   const context = useContext(SidebarContext);
@@ -47,7 +43,7 @@ export const SidebarProvider = ({
   const setOpen = setOpenProp !== undefined ? setOpenProp : setOpenState;
 
   return (
-    <SidebarContext.Provider value={{ open, setOpen, animate }}>
+    <SidebarContext.Provider value={{ open, setOpen, animate: animate }}>
       {children}
     </SidebarContext.Provider>
   );
@@ -71,11 +67,11 @@ export const SidebarNew = ({
   );
 };
 
-export const SidebarBody = (props: React.ComponentProps<"div">) => {
+export const SidebarBody = (props: React.ComponentProps<typeof motion.div>) => {
   return (
     <>
       <DesktopSidebar {...props} />
-      <MobileSidebar {...props} />
+      <MobileSidebar {...(props as React.ComponentProps<"div">)} />
     </>
   );
 };
@@ -84,23 +80,25 @@ export const DesktopSidebar = ({
   className,
   children,
   ...props
-}: React.ComponentProps<"div">) => {
+}: React.ComponentProps<typeof motion.div>) => {
   const { open, setOpen, animate } = useSidebarNew();
   return (
-    <motion.div
-      className={cn(
-        "h-full px-4 py-4 hidden md:flex md:flex-col bg-surface-container w-[280px] flex-shrink-0 border-r border-outline shadow-elevation-1",
-        className
-      )}
-      animate={{
-        width: animate ? (open ? "280px" : "60px") : "280px",
-      }}
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
-      {...props}
-    >
-      {children}
-    </motion.div>
+    <>
+      <motion.div
+        className={cn(
+          "h-full px-4 py-4 hidden md:flex md:flex-col bg-surface-container border-r border-outline w-[300px] flex-shrink-0 shadow-elevation-1",
+          className
+        )}
+        animate={{
+          width: animate ? (open ? "300px" : "80px") : "300px",
+        }}
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+        {...props}
+      >
+        {children}
+      </motion.div>
+    </>
   );
 };
 
@@ -114,14 +112,30 @@ export const MobileSidebar = ({
     <>
       <div
         className={cn(
-          "h-12 px-4 py-3 flex flex-row md:hidden items-center justify-between bg-surface-container w-full border-b border-outline shadow-elevation-1"
+          "h-10 px-4 py-4 flex flex-row md:hidden items-center justify-between bg-surface-container border-b border-outline w-full"
         )}
       >
         <div className="flex justify-end z-20 w-full">
-          <Menu
-            className="text-on-surface cursor-pointer"
+          <button
+            className="text-on-surface"
             onClick={() => setOpen(!open)}
-          />
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="text-on-surface"
+            >
+              <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+              <polyline points="9,22 9,12 15,12 15,22" />
+            </svg>
+          </button>
         </div>
         <AnimatePresence>
           {open && (
@@ -140,10 +154,24 @@ export const MobileSidebar = ({
               {...props}
             >
               <div
-                className="absolute right-10 top-10 z-50 text-on-surface cursor-pointer"
+                className="absolute right-10 top-10 z-50 text-on-surface"
                 onClick={() => setOpen(!open)}
               >
-                <X />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-on-surface"
+                >
+                  <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                  <polyline points="9,22 9,12 15,12 15,22" />
+                </svg>
               </div>
               {children}
             </motion.div>
@@ -157,35 +185,35 @@ export const MobileSidebar = ({
 export const SidebarLink = ({
   link,
   className,
-  onClick,
   ...props
 }: {
   link: Links;
   className?: string;
-  onClick?: () => void;
+  props?: LinkProps;
 }) => {
   const { open, animate } = useSidebarNew();
   return (
     <div
       className={cn(
-        "flex items-center justify-start gap-3 group/sidebar py-3 px-3 cursor-pointer rounded-xl transition-all duration-200 hover:bg-primary-container text-on-surface hover:text-on-primary-container",
+        "flex items-center justify-start gap-3 group/sidebar py-3 px-4 rounded-2xl hover:bg-primary-container transition-colors duration-200 cursor-pointer",
         className
       )}
-      onClick={onClick}
       {...props}
     >
-      <div className="flex-shrink-0">
-        {link.icon}
-      </div>
+      {link.icon}
+
       <motion.span
         animate={{
           display: animate ? (open ? "inline-block" : "none") : "inline-block",
           opacity: animate ? (open ? 1 : 0) : 1,
         }}
-        className="text-sm font-medium group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0 label-large"
+        className="text-on-surface text-sm group-hover/sidebar:text-on-primary-container transition duration-150 whitespace-pre inline-block !p-0 !m-0 body-medium"
       >
         {link.label}
       </motion.span>
     </div>
   );
 };
+
+// Define LinkProps interface
+interface LinkProps extends React.ComponentProps<"div"> {}
