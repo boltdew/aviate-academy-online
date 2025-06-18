@@ -13,7 +13,6 @@ import {
   useMaterialSidebar
 } from "@/components/ui/material-sidebar";
 import { LayoutDashboard, Plane, User, Settings, BarChart3, Award, BookOpen } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { HierarchicalContentTree } from "./sidebar/HierarchicalContentTree";
 
 interface AircraftSidebarProps {
@@ -209,12 +208,12 @@ const SidebarFooterContent = () => {
   );
 };
 
-export function AircraftSidebar({ 
+const SidebarContentWrapper = ({ 
   selectedContent, 
   selectedSection, 
   onContentSelect, 
   onSectionSelect 
-}: AircraftSidebarProps) {
+}: AircraftSidebarProps) => {
   const [selectedFunction, setSelectedFunction] = useState<string | null>(null);
 
   const handleFunctionSelect = (functionName: string) => {
@@ -228,53 +227,40 @@ export function AircraftSidebar({
   };
 
   return (
+    <MaterialSidebarContent>
+      <MaterialSidebarHeader>
+        <SidebarLogo />
+      </MaterialSidebarHeader>
+      
+      <MaterialSidebarBody>
+        <NavigationSection
+          selectedContent={selectedContent}
+          selectedSection={selectedSection}
+          selectedFunction={selectedFunction}
+          onContentSelect={onContentSelect}
+          onSectionSelect={onSectionSelect}
+          onFunctionSelect={handleFunctionSelect}
+        />
+      </MaterialSidebarBody>
+      
+      <MaterialSidebarFooter>
+        <SidebarFooterContent />
+      </MaterialSidebarFooter>
+    </MaterialSidebarContent>
+  );
+};
+
+export function AircraftSidebar(props: AircraftSidebarProps) {
+  return (
     <>
       {/* Desktop Sidebar */}
       <MaterialSidebar>
-        <MaterialSidebarContent>
-          <MaterialSidebarHeader>
-            <SidebarLogo />
-          </MaterialSidebarHeader>
-          
-          <MaterialSidebarBody>
-            <NavigationSection
-              selectedContent={selectedContent}
-              selectedSection={selectedSection}
-              selectedFunction={selectedFunction}
-              onContentSelect={onContentSelect}
-              onSectionSelect={onSectionSelect}
-              onFunctionSelect={handleFunctionSelect}
-            />
-          </MaterialSidebarBody>
-          
-          <MaterialSidebarFooter>
-            <SidebarFooterContent />
-          </MaterialSidebarFooter>
-        </MaterialSidebarContent>
+        <SidebarContentWrapper {...props} />
       </MaterialSidebar>
 
       {/* Mobile Sidebar Overlay */}
       <MaterialSidebarOverlay>
-        <MaterialSidebarContent>
-          <MaterialSidebarHeader>
-            <SidebarLogo />
-          </MaterialSidebarHeader>
-          
-          <MaterialSidebarBody>
-            <NavigationSection
-              selectedContent={selectedContent}
-              selectedSection={selectedSection}
-              selectedFunction={selectedFunction}
-              onContentSelect={onContentSelect}
-              onSectionSelect={onSectionSelect}
-              onFunctionSelect={handleFunctionSelect}
-            />
-          </MaterialSidebarBody>
-          
-          <MaterialSidebarFooter>
-            <SidebarFooterContent />
-          </MaterialSidebarFooter>
-        </MaterialSidebarContent>
+        <SidebarContentWrapper {...props} />
       </MaterialSidebarOverlay>
     </>
   );

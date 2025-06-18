@@ -15,6 +15,11 @@ const Dashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const isMobile = useIsMobile();
 
+  // Initialize sidebar state based on device type
+  useEffect(() => {
+    setSidebarOpen(!isMobile);
+  }, [isMobile]);
+
   useEffect(() => {
     const handleContentSelected = (event: CustomEvent) => {
       setSelectedContent(event.detail);
