@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -14,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { useUser } from "@clerk/clerk-react";
+import { useUser, useClerk } from "@clerk/clerk-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useNavigate } from "react-router-dom";
@@ -29,6 +28,7 @@ export function AppHeader({ onMenuToggle, onSearch, onUserFunctionSelect }: AppH
   const [searchQuery, setSearchQuery] = useState("");
   const [isDarkMode, setIsDarkMode] = useState(false);
   const { user } = useUser();
+  const { signOut } = useClerk();
   const isMobile = useIsMobile();
   const navigate = useNavigate();
 
@@ -58,6 +58,10 @@ export function AppHeader({ onMenuToggle, onSearch, onUserFunctionSelect }: AppH
 
   const handleLogoClick = () => {
     navigate('/');
+  };
+
+  const handleSignOut = () => {
+    signOut();
   };
 
   return (
@@ -248,7 +252,10 @@ export function AppHeader({ onMenuToggle, onSearch, onUserFunctionSelect }: AppH
               </>
             )}
             <DropdownMenuSeparator className="bg-outline-variant my-2" />
-            <DropdownMenuItem className="hover:bg-error-container hover:text-on-error-container rounded-2xl mx-1 px-3 py-2.5">
+            <DropdownMenuItem 
+              onClick={handleSignOut}
+              className="hover:bg-error-container hover:text-on-error-container rounded-2xl mx-1 px-3 py-2.5"
+            >
               Sign out
             </DropdownMenuItem>
           </DropdownMenuContent>
