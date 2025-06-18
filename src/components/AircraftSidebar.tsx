@@ -29,31 +29,29 @@ export function AircraftSidebar({ selectedContent, onContentSelect }: AircraftSi
   ];
 
   return (
-    <div className={cn("flex flex-col md:flex-row bg-white dark:bg-neutral-900 w-full flex-1 border-r border-neutral-200 dark:border-neutral-700 overflow-hidden")}>
-      <SidebarNew open={open} setOpen={setOpen}>
-        <SidebarBody className="justify-between gap-6">
-          <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-            {/* Logo */}
-            {open ? <Logo /> : <LogoIcon />}
-            
-            {/* Navigation Links */}
-            <div className="mt-6 flex flex-col gap-1">
-              {links.map((link, idx) => (
-                <SidebarLink key={idx} link={link} />
-              ))}
-            </div>
-
-            {/* Hierarchical Content Tree */}
-            <div className="mt-6">
-              <HierarchicalContentTree 
-                selectedContent={selectedContent}
-                onContentSelect={onContentSelect}
-              />
-            </div>
+    <SidebarNew open={open} setOpen={setOpen}>
+      <SidebarBody className="justify-between gap-6">
+        <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
+          {/* Logo */}
+          {open ? <Logo /> : <LogoIcon />}
+          
+          {/* Navigation Links */}
+          <div className="mt-6 flex flex-col gap-1">
+            {links.map((link, idx) => (
+              <SidebarLink key={idx} link={link} />
+            ))}
           </div>
-        </SidebarBody>
-      </SidebarNew>
-    </div>
+
+          {/* Hierarchical Content Tree */}
+          <div className="mt-6">
+            <HierarchicalContentTree 
+              selectedContent={selectedContent}
+              onContentSelect={onContentSelect}
+            />
+          </div>
+        </div>
+      </SidebarBody>
+    </SidebarNew>
   );
 }
 
