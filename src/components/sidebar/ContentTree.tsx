@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   ChevronRight,
@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ContentService } from "@/services/contentService";
+import type { ContentStructure } from "@/types/ata";
 
 const variants = {
   open: {
@@ -39,9 +40,23 @@ interface ContentTreeProps {
 export function ContentTree({ isCollapsed, selectedContent, onContentSelect }: ContentTreeProps) {
   const [expandedChapters, setExpandedChapters] = useState<Set<string>>(new Set());
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
+  const [contentStructure, setContentStructure] = useState<ContentStructure>({});
+  const [loading, setLoading] = useState(true);
 
-  // Get content structure from ContentService
-  const contentStructure = ContentService.getContentStructure();
+  useEffect(() => {
+    const loadContent = async () => {
+      try {
+        const structure = await ContentService.getContentStructure();
+        setContentStructure(structure);
+      } catch (error) {
+        console.error('Failed to load content structure:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadContent();
+  }, []);
 
   const toggleChapter = (chapterCode: string) => {
     const newExpanded = new Set(expandedChapters);
@@ -77,6 +92,14 @@ export function ContentTree({ isCollapsed, selectedContent, onContentSelect }: C
       onContentSelect(contentKey);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="px-2 py-4">
+        <p className="text-xs text-slate-500">Loading content...</p>
+      </div>
+    );
+  }
 
   return (
     <>
