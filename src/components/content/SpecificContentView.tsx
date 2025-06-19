@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { BookOpen, Star, Award, Bookmark, FileText, Edit3, Save, X } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,8 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
+import { SecureMarkdown } from "@/components/ui/secure-markdown";
 import { ContentService } from "@/services/contentService";
 import { BookmarkService } from "@/services/bookmarkService";
+import { InputValidator } from "@/utils/inputValidator";
 import { Content404 } from "./Content404";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useState, useEffect } from "react";
@@ -25,6 +26,7 @@ export function SpecificContentView({ selectedContent }: SpecificContentViewProp
   const [note, setNote] = useState("");
   const [isEditingNote, setIsEditingNote] = useState(false);
   const [tempNote, setTempNote] = useState("");
+  const [noteErrors, setNoteErrors] = useState<string[]>([]);
   
   console.log(`🎯 Loading content for: ${selectedContent.chapter}-${selectedContent.section}-${selectedContent.file}`);
   
@@ -91,14 +93,44 @@ export function SpecificContentView({ selectedContent }: SpecificContentViewProp
   };
 
   const handleSaveNote = () => {
-    BookmarkService.saveNote(contentId, tempNote);
-    setNote(tempNote);
-    setIsEditingNote(false);
+    // Validate note before saving
+    const validation = InputValidator.validateNote(tempNote);
+    
+    if (!validation.isValid) {
+      setNoteErrors(validation.errors);
+      return;
+    }
+
+    const success = BookmarkService.saveNote(contentId, validation.sanitizedValue);
+    if (success) {
+      setNote(validation.sanitizedValue);
+      setTempNote(validation.sanitizedValue);
+      setIsEditingNote(false);
+      setNoteErrors([]);
+    } else {
+      setNoteErrors(['Failed to save note. Please try again.']);
+    }
   };
 
   const handleCancelNote = () => {
     setTempNote(note);
     setIsEditingNote(false);
+    setNoteErrors([]);
+  };
+
+  const handleNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    setTempNote(value);
+    
+    // Clear errors when user starts typing
+    if (noteErrors.length > 0) {
+      setNoteErrors([]);
+    }
+    
+    // Show character count warning
+    if (value.length > InputValidator.MAX_NOTE_LENGTH * 0.9) {
+      setNoteErrors([`Approaching character limit (${value.length}/${InputValidator.MAX_NOTE_LENGTH})`]);
+    }
   };
 
   const getDifficultyColor = (difficulty: string) => {
@@ -121,7 +153,6 @@ export function SpecificContentView({ selectedContent }: SpecificContentViewProp
         {/* Enhanced Header Card */}
         <Card className="bg-surface-container border-outline shadow-elevation-3 rounded-3xl overflow-hidden">
           <div className="bg-gradient-to-br from-primary/15 via-secondary/10 to-tertiary/15 p-6 sm:p-8 relative overflow-hidden">
-            {/* Background Pattern */}
             <div className="absolute inset-0 opacity-5">
               <div className="absolute top-0 right-0 w-64 h-64 bg-primary rounded-full -mr-32 -mt-32"></div>
               <div className="absolute bottom-0 left-0 w-48 h-48 bg-secondary rounded-full -ml-24 -mb-24"></div>
@@ -191,17 +222,33 @@ export function SpecificContentView({ selectedContent }: SpecificContentViewProp
           <CardContent className="pt-0">
             {isEditingNote ? (
               <div className="space-y-4">
-                <Textarea
-                  value={tempNote}
-                  onChange={(e) => setTempNote(e.target.value)}
-                  placeholder="Add your personal notes about this content..."
-                  className="min-h-[120px] rounded-2xl border-outline-variant focus:border-primary resize-none"
-                />
+                <div>
+                  <Textarea
+                    value={tempNote}
+                    onChange={handleNoteChange}
+                    placeholder="Add your personal notes about this content..."
+                    className="min-h-[120px] rounded-2xl border-outline-variant focus:border-primary resize-none"
+                    maxLength={InputValidator.MAX_NOTE_LENGTH}
+                  />
+                  <div className="flex justify-between items-center mt-2">
+                    <span className="text-xs text-on-surface-variant">
+                      {tempNote.length}/{InputValidator.MAX_NOTE_LENGTH} characters
+                    </span>
+                  </div>
+                </div>
+                {noteErrors.length > 0 && (
+                  <div className="text-sm text-error space-y-1">
+                    {noteErrors.map((error, index) => (
+                      <p key={index}>{error}</p>
+                    ))}
+                  </div>
+                )}
                 <div className="flex gap-2">
                   <Button
                     onClick={handleSaveNote}
                     size="sm"
                     className="h-8 px-4 rounded-xl bg-primary hover:bg-primary/90"
+                    disabled={noteErrors.some(error => error.includes('exceed')) || tempNote.length === 0}
                   >
                     <Save className="h-4 w-4 mr-2" />
                     Save
@@ -229,11 +276,12 @@ export function SpecificContentView({ selectedContent }: SpecificContentViewProp
           </CardContent>
         </Card>
 
-        {/* Enhanced Content Card */}
+        {/* Enhanced Content Card with Secure Rendering */}
         <Card className="bg-surface-container border-outline shadow-elevation-2 rounded-3xl overflow-hidden">
           <CardContent className="p-0">
             <div className="p-6 sm:p-8 lg:p-10">
-              <div 
+              <SecureMarkdown 
+                content={content.content}
                 className="
                   prose prose-lg max-w-none
                   [&>h1]:text-2xl sm:[&>h1]:text-3xl [&>h1]:font-bold [&>h1]:mb-6 [&>h1]:mt-8 [&>h1]:text-on-surface [&>h1]:border-b [&>h1]:border-outline-variant [&>h1]:pb-4
@@ -254,12 +302,6 @@ export function SpecificContentView({ selectedContent }: SpecificContentViewProp
                   [&>em]:text-on-surface-variant [&>em]:italic
                   [&>a]:text-primary [&>a]:no-underline hover:[&>a]:text-primary/80 hover:[&>a]:underline [&>a]:font-medium
                 "
-                style={{
-                  fontSize: isMobile ? '1rem' : '1.125rem',
-                  lineHeight: '1.75',
-                  fontFamily: 'system-ui, -apple-system, sans-serif'
-                }}
-                dangerouslySetInnerHTML={{ __html: content.content }}
               />
             </div>
           </CardContent>

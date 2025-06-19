@@ -1,4 +1,6 @@
 
+import { InputValidator } from '@/utils/inputValidator';
+
 interface Bookmark {
   id: string;
   title: string;
@@ -29,15 +31,22 @@ export class BookmarkService {
 
   static addBookmark(id: string, title: string, chapter: string, section: string): void {
     try {
+      // Validate inputs
+      const titleValidation = InputValidator.validateNote(title);
+      if (!titleValidation.isValid) {
+        console.error('Invalid bookmark title:', titleValidation.errors);
+        return;
+      }
+
       const bookmarks = this.getBookmarks();
       const existing = bookmarks.find(b => b.id === id);
       
       if (!existing) {
         const newBookmark: Bookmark = {
-          id,
-          title,
-          chapter,
-          section,
+          id: id.replace(/[<>'"]/g, ''), // Basic sanitization for ID
+          title: titleValidation.sanitizedValue,
+          chapter: chapter.replace(/[<>'"]/g, ''),
+          section: section.replace(/[<>'"]/g, ''),
           timestamp: Date.now()
         };
         bookmarks.push(newBookmark);
@@ -51,10 +60,11 @@ export class BookmarkService {
 
   static removeBookmark(id: string): void {
     try {
+      const sanitizedId = id.replace(/[<>'"]/g, '');
       const bookmarks = this.getBookmarks();
-      const filtered = bookmarks.filter(b => b.id !== id);
+      const filtered = bookmarks.filter(b => b.id !== sanitizedId);
       localStorage.setItem(this.BOOKMARKS_KEY, JSON.stringify(filtered));
-      console.log('🗑️ Bookmark removed:', id);
+      console.log('🗑️ Bookmark removed:', sanitizedId);
     } catch (error) {
       console.error('Error removing bookmark:', error);
     }
@@ -62,34 +72,45 @@ export class BookmarkService {
 
   static isBookmarked(id: string): boolean {
     try {
+      const sanitizedId = id.replace(/[<>'"]/g, '');
       const bookmarks = this.getBookmarks();
-      return bookmarks.some(b => b.id === id);
+      return bookmarks.some(b => b.id === sanitizedId);
     } catch (error) {
       console.error('Error checking bookmark status:', error);
       return false;
     }
   }
 
-  static saveNote(id: string, content: string): void {
+  static saveNote(id: string, content: string): boolean {
     try {
+      // Validate note content
+      const validation = InputValidator.validateNote(content);
+      if (!validation.isValid) {
+        console.error('Invalid note content:', validation.errors);
+        return false;
+      }
+
       const notes = this.getNotes();
       const note: Note = {
-        id,
-        content,
+        id: id.replace(/[<>'"]/g, ''),
+        content: validation.sanitizedValue,
         timestamp: Date.now()
       };
-      notes[id] = note;
+      notes[note.id] = note;
       localStorage.setItem(this.NOTES_KEY, JSON.stringify(notes));
-      console.log('📝 Note saved:', id);
+      console.log('📝 Note saved:', note.id);
+      return true;
     } catch (error) {
       console.error('Error saving note:', error);
+      return false;
     }
   }
 
   static getNote(id: string): Note | null {
     try {
+      const sanitizedId = id.replace(/[<>'"]/g, '');
       const notes = this.getNotes();
-      return notes[id] || null;
+      return notes[sanitizedId] || null;
     } catch (error) {
       console.error('Error loading note:', error);
       return null;
