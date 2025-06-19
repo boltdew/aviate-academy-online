@@ -1,74 +1,101 @@
 
-import React from "react";
-import { AlertTriangle, RefreshCw } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-interface ErrorBoundaryState {
+interface Props {
+  children: ReactNode;
+  fallback?: ReactNode;
+}
+
+interface State {
   hasError: boolean;
   error?: Error;
+  errorInfo?: ErrorInfo;
 }
 
-interface ErrorBoundaryProps {
-  children: React.ReactNode;
-  fallback?: React.ComponentType<{ error?: Error; retry?: () => void }>;
-}
-
-export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  constructor(props: ErrorBoundaryProps) {
+export class ErrorBoundary extends Component<Props, State> {
+  constructor(props: Props) {
     super(props);
     this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+  public static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error("Error caught by boundary:", error, errorInfo);
+  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    this.setState({ error, errorInfo });
   }
 
-  render() {
-    if (this.state.hasError) {
-      const retry = () => {
-        this.setState({ hasError: false, error: undefined });
-      };
+  private handleReset = () => {
+    this.setState({ hasError: false, error: undefined, errorInfo: undefined });
+  };
 
+  private handleReload = () => {
+    window.location.reload();
+  };
+
+  public render() {
+    if (this.state.hasError) {
       if (this.props.fallback) {
-        const FallbackComponent = this.props.fallback;
-        return <FallbackComponent error={this.state.error} retry={retry} />;
+        return this.props.fallback;
       }
 
-      return <DefaultErrorFallback error={this.state.error} retry={retry} />;
+      return (
+        <div className="flex items-center justify-center min-h-[400px] p-4">
+          <Card className="w-full max-w-md bg-surface-container border-outline shadow-elevation-2 rounded-3xl">
+            <CardHeader className="text-center">
+              <div className="w-12 h-12 bg-error-container rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <AlertTriangle className="h-6 w-6 text-error" />
+              </div>
+              <CardTitle className="text-xl font-bold text-on-surface">
+                Something went wrong
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-on-surface-variant text-center">
+                An unexpected error occurred. Please try refreshing the page or contact support if the problem persists.
+              </p>
+              
+              {process.env.NODE_ENV === 'development' && this.state.error && (
+                <div className="bg-error-container/10 border border-error-container rounded-2xl p-3">
+                  <details className="text-xs">
+                    <summary className="cursor-pointer font-medium text-error mb-2">
+                      Error Details (Development)
+                    </summary>
+                    <pre className="whitespace-pre-wrap text-error/80">
+                      {this.state.error.toString()}
+                      {this.state.errorInfo?.componentStack}
+                    </pre>
+                  </details>
+                </div>
+              )}
+              
+              <div className="flex gap-2">
+                <Button
+                  onClick={this.handleReset}
+                  variant="outline"
+                  className="flex-1 rounded-2xl"
+                >
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Try Again
+                </Button>
+                <Button
+                  onClick={this.handleReload}
+                  className="flex-1 bg-primary text-on-primary hover:bg-primary/90 rounded-2xl"
+                >
+                  Reload Page
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      );
     }
 
     return this.props.children;
   }
-}
-
-function DefaultErrorFallback({ error, retry }: { error?: Error; retry?: () => void }) {
-  return (
-    <div className="flex items-center justify-center h-full min-h-[400px] p-6">
-      <Alert className="max-w-md">
-        <AlertTriangle className="h-4 w-4" />
-        <AlertTitle>Something went wrong</AlertTitle>
-        <AlertDescription className="mt-2">
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-            {error?.message || "An unexpected error occurred. Please try again."}
-          </p>
-          {retry && (
-            <Button
-              onClick={retry}
-              variant="outline"
-              size="sm"
-              className="gap-2"
-            >
-              <RefreshCw className="h-3 w-3" />
-              Try again
-            </Button>
-          )}
-        </AlertDescription>
-      </Alert>
-    </div>
-  );
 }

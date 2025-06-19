@@ -13,14 +13,16 @@ export class ContentService {
     if (this.initialized) return;
     
     try {
+      console.log('🔄 Initializing ContentService...');
       const { index, contents } = await createComprehensiveATAData();
       this.contentIndex = index;
       this.contents = contents;
       this.contentStructure = buildContentStructure(index);
       this.initialized = true;
+      console.log(`✅ ContentService initialized with ${contents.length} contents`);
     } catch (error) {
-      console.error('Failed to initialize content:', error);
-      // Fallback to empty data
+      console.error('❌ Failed to initialize content:', error);
+      // Fallback to empty data but mark as initialized
       this.contentIndex = {};
       this.contents = [];
       this.contentStructure = {};
@@ -35,12 +37,17 @@ export class ContentService {
 
   static async getContentByChapterAndSection(chapter: string, section: string): Promise<MarkdownContent[]> {
     await this.initialize();
-    return this.contentIndex?.[chapter]?.[section] || [];
+    const result = this.contentIndex?.[chapter]?.[section] || [];
+    console.log(`📖 Found ${result.length} contents for ${chapter}-${section}`);
+    return result;
   }
 
   static async getSpecificContent(chapter: string, section: string, slug: string): Promise<MarkdownContent | null> {
+    await this.initialize();
     const sectionContents = await this.getContentByChapterAndSection(chapter, section);
-    return sectionContents.find(content => content.slug === slug) || null;
+    const result = sectionContents.find(content => content.slug === slug) || null;
+    console.log(`🎯 Specific content ${chapter}-${section}-${slug}:`, result ? 'found' : 'not found');
+    return result;
   }
 
   static async getAllContents(): Promise<MarkdownContent[]> {
@@ -55,7 +62,7 @@ export class ContentService {
     
     const contents = await this.getAllContents();
     const lowercaseQuery = query.toLowerCase().trim();
-    console.log(`🔍 Searching for: "${lowercaseQuery}"`);
+    console.log(`🔍 Searching for: "${lowercaseQuery}" in ${contents.length} contents`);
     
     const results = contents.filter(content => {
       const titleMatch = content.title.toLowerCase().includes(lowercaseQuery);
@@ -71,14 +78,16 @@ export class ContentService {
   }
 
   static async getContentStats() {
+    await this.initialize();
     const contents = await this.getAllContents();
-    const contentIndex = await this.initialize().then(() => this.contentIndex || {});
+    const contentIndex = this.contentIndex || {};
     
     return {
       totalContent: contents.length,
       chapters: Object.keys(contentIndex).length,
       difficulties: contents.reduce((acc, content) => {
-        acc[content.difficulty] = (acc[content.difficulty] || 0) + 1;
+        const difficulty = content.difficulty || 'Unknown';
+        acc[difficulty] = (acc[difficulty] || 0) + 1;
         return acc;
       }, {} as Record<string, number>)
     };

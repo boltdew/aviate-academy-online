@@ -22,6 +22,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     const handleContentSelected = (event: CustomEvent) => {
+      console.log('📖 Content selected:', event.detail);
       setSelectedContent(event.detail);
       setSelectedSection(null);
       setSelectedFunction(null);
@@ -29,6 +30,7 @@ const Dashboard = () => {
     };
 
     const handleSectionSelected = (event: CustomEvent) => {
+      console.log('📑 Section selected:', event.detail);
       setSelectedSection(event.detail);
       setSelectedContent(null);
       setSelectedFunction(null);
@@ -54,6 +56,7 @@ const Dashboard = () => {
   };
 
   const handleUserFunctionSelect = (func: string) => {
+    console.log("👤 User function selected:", func);
     setSelectedFunction(func);
     setSelectedContent(null);
     setSelectedSection(null);
@@ -63,6 +66,7 @@ const Dashboard = () => {
   };
 
   const handleContentSelect = (content: { chapter: string; section: string; file: string } | null) => {
+    console.log("📖 Content selection changed:", content);
     setSelectedContent(content);
     setSelectedSection(null);
     setSelectedFunction(null);
@@ -71,6 +75,7 @@ const Dashboard = () => {
   };
 
   const handleSectionSelect = (section: { chapter: string; section: string } | null) => {
+    console.log("📑 Section selection changed:", section);
     setSelectedSection(section);
     setSelectedContent(null);
     setSelectedFunction(null);
@@ -86,25 +91,32 @@ const Dashboard = () => {
     <ErrorBoundary>
       <MaterialSidebarProvider isOpen={sidebarOpen} onOpenChange={setSidebarOpen}>
         <div className="flex flex-col h-screen w-full bg-surface-container-lowest overflow-hidden">
-          <AppHeader 
-            onSearch={handleSearch}
-            onUserFunctionSelect={handleUserFunctionSelect}
-            onMenuToggle={handleMenuToggle}
-          />
-          <div className="flex flex-1 min-h-0 relative">
-            <AircraftSidebar 
-              selectedContent={selectedContent}
-              selectedSection={selectedSection}
-              onContentSelect={handleContentSelect}
-              onSectionSelect={handleSectionSelect}
+          <ErrorBoundary>
+            <AppHeader 
+              onSearch={handleSearch}
+              onUserFunctionSelect={handleUserFunctionSelect}
+              onMenuToggle={handleMenuToggle}
             />
-            
-            <main className="flex-1 overflow-hidden bg-surface-container-lowest">
-              <ContentArea 
+          </ErrorBoundary>
+          
+          <div className="flex flex-1 min-h-0 relative">
+            <ErrorBoundary>
+              <AircraftSidebar 
                 selectedContent={selectedContent}
                 selectedSection={selectedSection}
-                searchQuery={searchQuery}
+                onContentSelect={handleContentSelect}
+                onSectionSelect={handleSectionSelect}
               />
+            </ErrorBoundary>
+            
+            <main className="flex-1 overflow-hidden bg-surface-container-lowest">
+              <ErrorBoundary>
+                <ContentArea 
+                  selectedContent={selectedContent}
+                  selectedSection={selectedSection}
+                  searchQuery={searchQuery}
+                />
+              </ErrorBoundary>
             </main>
           </div>
         </div>

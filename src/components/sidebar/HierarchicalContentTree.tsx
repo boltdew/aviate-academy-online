@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -35,15 +34,21 @@ export function HierarchicalContentTree({
   const [bookmarks, setBookmarks] = useState<any[]>([]);
   const [contentStructure, setContentStructure] = useState<ContentStructure>({});
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { isOpen } = useMaterialSidebar();
 
   useEffect(() => {
     const loadContent = async () => {
       try {
+        setLoading(true);
+        setError(null);
+        console.log('🔄 Loading content structure...');
         const structure = await ContentService.getContentStructure();
         setContentStructure(structure);
+        console.log('✅ Content structure loaded:', Object.keys(structure).length, 'chapters');
       } catch (error) {
-        console.error('Failed to load content structure:', error);
+        console.error('❌ Failed to load content structure:', error);
+        setError('Failed to load content');
       } finally {
         setLoading(false);
       }
@@ -54,26 +59,32 @@ export function HierarchicalContentTree({
 
   // Load bookmarks
   useEffect(() => {
-    setBookmarks(BookmarkService.getBookmarks());
+    try {
+      setBookmarks(BookmarkService.getBookmarks());
+    } catch (error) {
+      console.error('Failed to load bookmarks:', error);
+      setBookmarks([]);
+    }
   }, []);
 
   // Check if content is bookmarked
   const isContentBookmarked = (chapter: string, section: string, file: string) => {
-    const contentId = `${chapter}-${section}-${file}`;
-    return BookmarkService.isBookmarked(contentId);
+    try {
+      const contentId = `${chapter}-${section}-${file}`;
+      return BookmarkService.isBookmarked(contentId);
+    } catch (error) {
+      console.error('Error checking bookmark status:', error);
+      return false;
+    }
   };
 
   // Auto-collapse logic: only keep currently selected chapter/section expanded
   useEffect(() => {
     if (selectedContent) {
-      // Keep only the selected chapter expanded
       setExpandedChapters(new Set([selectedContent.chapter]));
-      // Keep only the selected section expanded
       setExpandedSections(new Set([`${selectedContent.chapter}-${selectedContent.section}`]));
     } else if (selectedSection) {
-      // Keep only the selected chapter expanded
       setExpandedChapters(new Set([selectedSection.chapter]));
-      // Keep only the selected section expanded  
       setExpandedSections(new Set([`${selectedSection.chapter}-${selectedSection.section}`]));
     }
   }, [selectedContent, selectedSection]);
@@ -160,6 +171,28 @@ export function HierarchicalContentTree({
     );
   }
 
+  if (error) {
+    return (
+      <div className="px-4 py-4">
+        <p className="text-xs text-red-500">{error}</p>
+        <button 
+          onClick={() => window.location.reload()} 
+          className="text-xs text-primary mt-2 hover:underline"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  if (Object.keys(contentStructure).length === 0) {
+    return (
+      <div className="px-4 py-4">
+        <p className="text-xs text-on-surface-variant">No content available</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-2">
       {/* Content Tree */}
@@ -193,7 +226,7 @@ export function HierarchicalContentTree({
               </div>
 
               {/* Sections Level */}
-              {isChapterExpanded && (
+              {isChapterExpanded && chapterData.sections && (
                 <div className="ml-6 space-y-1 border-l-2 border-outline-variant pl-3 mt-1">
                   {Object.entries(chapterData.sections).map(([sectionKey, sectionData]) => {
                     const sectionId = `${chapterCode}-${sectionKey}`;
@@ -235,7 +268,7 @@ export function HierarchicalContentTree({
                           </div>
                           <div className="flex items-center gap-1">
                             <span className="text-xs text-on-surface-variant bg-surface-variant px-1.5 py-0.5 rounded">
-                              {sectionData.files?.length || 0}
+                              {sectionData?.files?.length || 0}
                             </span>
                             <button
                               onClick={(e) => {
@@ -254,7 +287,7 @@ export function HierarchicalContentTree({
                         </div>
                         
                         {/* Files Level */}
-                        {isSectionExpanded && sectionData.files && (
+                        {isSectionExpanded && sectionData?.files && Array.isArray(sectionData.files) && (
                           <div className="ml-4 space-y-1 border-l border-outline-variant pl-3">
                             {sectionData.files.map((file) => {
                               const isBookmarked = isContentBookmarked(chapterCode, sectionKey, file.slug);
