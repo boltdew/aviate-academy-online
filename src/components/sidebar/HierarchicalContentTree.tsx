@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -14,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { ContentService } from "@/services/contentService";
 import { BookmarkService } from "@/services/bookmarkService";
 import { useMaterialSidebar } from "@/components/ui/material-sidebar";
+import type { ContentStructure } from "@/types/ata";
 
 interface HierarchicalContentTreeProps {
   selectedContent: { chapter: string; section: string; file: string } | null;
@@ -31,9 +33,24 @@ export function HierarchicalContentTree({
   const [expandedChapters, setExpandedChapters] = useState<Set<string>>(new Set());
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
   const [bookmarks, setBookmarks] = useState<any[]>([]);
+  const [contentStructure, setContentStructure] = useState<ContentStructure>({});
+  const [loading, setLoading] = useState(true);
   const { isOpen } = useMaterialSidebar();
 
-  const contentStructure = ContentService.getContentStructure();
+  useEffect(() => {
+    const loadContent = async () => {
+      try {
+        const structure = await ContentService.getContentStructure();
+        setContentStructure(structure);
+      } catch (error) {
+        console.error('Failed to load content structure:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadContent();
+  }, []);
 
   // Load bookmarks
   useEffect(() => {
@@ -135,6 +152,14 @@ export function HierarchicalContentTree({
     );
   }
 
+  if (loading) {
+    return (
+      <div className="px-4 py-4">
+        <p className="text-xs text-on-surface-variant">Loading content...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-2">
       {/* Content Tree */}
@@ -210,7 +235,7 @@ export function HierarchicalContentTree({
                           </div>
                           <div className="flex items-center gap-1">
                             <span className="text-xs text-on-surface-variant bg-surface-variant px-1.5 py-0.5 rounded">
-                              {sectionData.files.length}
+                              {sectionData.files?.length || 0}
                             </span>
                             <button
                               onClick={(e) => {
@@ -229,7 +254,7 @@ export function HierarchicalContentTree({
                         </div>
                         
                         {/* Files Level */}
-                        {isSectionExpanded && (
+                        {isSectionExpanded && sectionData.files && (
                           <div className="ml-4 space-y-1 border-l border-outline-variant pl-3">
                             {sectionData.files.map((file) => {
                               const isBookmarked = isContentBookmarked(chapterCode, sectionKey, file.slug);

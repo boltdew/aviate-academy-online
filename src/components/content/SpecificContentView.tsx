@@ -11,6 +11,7 @@ import { BookmarkService } from "@/services/bookmarkService";
 import { Content404 } from "./Content404";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useState, useEffect } from "react";
+import type { MarkdownContent } from "@/types/content";
 
 interface SpecificContentViewProps {
   selectedContent: { chapter: string; section: string; file: string };
@@ -18,36 +19,63 @@ interface SpecificContentViewProps {
 
 export function SpecificContentView({ selectedContent }: SpecificContentViewProps) {
   const isMobile = useIsMobile();
+  const [content, setContent] = useState<MarkdownContent | null>(null);
+  const [loading, setLoading] = useState(true);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [note, setNote] = useState("");
   const [isEditingNote, setIsEditingNote] = useState(false);
   const [tempNote, setTempNote] = useState("");
   
-  console.log(`🎯 ContentService.getSpecificContent(${selectedContent.chapter}, ${selectedContent.section}, ${selectedContent.file})`);
+  console.log(`🎯 Loading content for: ${selectedContent.chapter}-${selectedContent.section}-${selectedContent.file}`);
   
-  const content = ContentService.getSpecificContent(
-    selectedContent.chapter,
-    selectedContent.section,
-    selectedContent.file
-  );
-
   useEffect(() => {
-    if (content) {
-      const contentId = `${selectedContent.chapter}-${selectedContent.section}-${selectedContent.file}`;
-      setIsBookmarked(BookmarkService.isBookmarked(contentId));
-      
-      const savedNote = BookmarkService.getNote(contentId);
-      setNote(savedNote?.content || "");
-      setTempNote(savedNote?.content || "");
-    }
-  }, [content, selectedContent]);
+    const loadContent = async () => {
+      try {
+        setLoading(true);
+        const loadedContent = await ContentService.getSpecificContent(
+          selectedContent.chapter,
+          selectedContent.section,
+          selectedContent.file
+        );
+        setContent(loadedContent);
+        
+        if (loadedContent) {
+          const contentId = `${selectedContent.chapter}-${selectedContent.section}-${selectedContent.file}`;
+          setIsBookmarked(BookmarkService.isBookmarked(contentId));
+          
+          const savedNote = BookmarkService.getNote(contentId);
+          setNote(savedNote?.content || "");
+          setTempNote(savedNote?.content || "");
+          console.log(`✅ Found specific content: ${loadedContent.slug}`);
+        } else {
+          console.log("❌ Content not found");
+        }
+      } catch (error) {
+        console.error('Failed to load content:', error);
+        setContent(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadContent();
+  }, [selectedContent]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-96 px-4">
+        <div className="text-center">
+          <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-on-surface-variant">Loading content...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!content) {
-    console.log("❌ Content not found");
     return <Content404 />;
   }
 
-  console.log(`✅ Found specific content: ${content.slug}`);
   console.log(`📄 Displaying specific content: ${content.slug}`);
 
   const contentId = `${selectedContent.chapter}-${selectedContent.section}-${selectedContent.file}`;

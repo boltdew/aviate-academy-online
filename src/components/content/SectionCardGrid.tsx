@@ -1,7 +1,6 @@
-
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Clock, User, BookOpen, Star, ChevronRight, FileText, Award, TrendingUp, Sparkles } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { ContentService } from "@/services/contentService";
 import { useIsMobile } from "@/hooks/use-mobile";
+import type { MarkdownContent } from "@/types/content";
 
 interface SectionCardGridProps {
   chapter: string;
@@ -19,11 +19,42 @@ interface SectionCardGridProps {
 export function SectionCardGrid({ chapter, section, onContentSelect }: SectionCardGridProps) {
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+  const [contents, setContents] = useState<MarkdownContent[]>([]);
+  const [chapterTitle, setChapterTitle] = useState<string>(`Chapter ${chapter}`);
+  const [loading, setLoading] = useState(true);
   const isMobile = useIsMobile();
 
-  // Get section contents
-  const contents = ContentService.getContentByChapterAndSection(chapter, section);
-  const chapterTitle = ContentService.getContentStructure()[chapter]?.title || `Chapter ${chapter}`;
+  useEffect(() => {
+    const loadContent = async () => {
+      try {
+        setLoading(true);
+        const [sectionContents, contentStructure] = await Promise.all([
+          ContentService.getContentByChapterAndSection(chapter, section),
+          ContentService.getContentStructure()
+        ]);
+        setContents(sectionContents);
+        setChapterTitle(contentStructure[chapter]?.title || `Chapter ${chapter}`);
+      } catch (error) {
+        console.error('Failed to load section content:', error);
+        setContents([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadContent();
+  }, [chapter, section]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-96 px-4">
+        <div className="text-center">
+          <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-on-surface-variant">Loading content...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (contents.length === 0) {
     return (
