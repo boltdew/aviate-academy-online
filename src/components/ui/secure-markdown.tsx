@@ -22,9 +22,7 @@ export function SecureMarkdown({ content, className = '' }: SecureMarkdownProps)
         'thead', 'tbody', 'tr', 'th', 'td'
       ],
       ALLOWED_ATTR: ['class'],
-      KEEP_CONTENT: true,
-      RETURN_DOM_FRAGMENT: false,
-      RETURN_DOM_IMPORT: false
+      KEEP_CONTENT: true
     });
     
     return cleanHtml;
